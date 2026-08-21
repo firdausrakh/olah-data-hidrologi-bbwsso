@@ -1,0 +1,15 @@
+{
+  "name": "olah-data-hidrologi-bbwsso",
+  "version": "1.0.0",
+  "description": "Monitoring Hidrologi BBWS Serayu Opak - Web Application",
+  "private": true,
+  "scripts": {
+    "postinstall": "mkdir -p static/js/vendor && cp node_modules/@vercel/speed-insights/dist/index.js static/js/vendor/speed-insights.js"
+  },
+  "dependencies": {
+    "@vercel/speed-insights": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,434 @@
+/* ============================================================
+   Monitoring Telemetri
+   Page-specific layout/table behavior only. Reusable UI primitives
+   are defined in ui-components.css and use semantic theme tokens.
+   ============================================================ */
+
+.monitoring-page {
+    --monitor-primary: var(--component-icon);
+    --monitor-primary-deep: var(--primary-hover);
+    --monitor-blue-soft: var(--surface-soft);
+    --monitor-yellow: var(--pu-yellow);
+    --monitor-border: var(--border-color);
+    --monitor-muted: var(--text-muted);
+    --monitor-soft: var(--bg-soft);
+    --monitor-success: var(--success);
+    --monitor-warning: var(--warning);
+    --monitor-danger: var(--danger);
+}
+
+/* Filter panel */
+.monitor-form-stack { display: flex; flex-direction: column; gap: 11px; }
+.monitoring-page .monitor-field { gap: 5px; }
+.monitoring-page .period-detail {
+    margin-top: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+.monitoring-page .period-detail.one { grid-template-columns: 1fr; }
+.monitoring-page .period-detail > * { min-width: 0; }
+.monitoring-page .period-detail[hidden] { display: none !important; }
+.monitor-date-wrap { position: relative; }
+.monitor-date-wrap input { padding-right: 34px !important; cursor: pointer; }
+.monitor-date-wrap svg {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14px;
+    height: 14px;
+    color: var(--component-icon);
+    pointer-events: none;
+}
+.monitor-actions { display: grid; gap: 8px; margin-top: 3px; }
+.monitor-actions .btn {
+    width: 100%;
+    min-height: 38px;
+    border-radius: 9px !important;
+    justify-content: center;
+    gap: 7px;
+    font-size: .65rem !important;
+    font-weight: 800 !important;
+}
+.monitor-primary-btn {
+    color: var(--primary-action-text) !important;
+    background: var(--primary-action-bg) !important;
+    border: 1px solid var(--primary-action-bg) !important;
+}
+.monitor-primary-btn:not(:disabled):hover {
+    background: var(--primary-action-hover) !important;
+    border-color: var(--primary-action-hover) !important;
+}
+.monitor-download-btn {
+    color: var(--secondary-action-text) !important;
+    background: var(--secondary-action-bg) !important;
+    border: 1px solid var(--secondary-action-bg) !important;
+}
+.monitor-download-btn:not(:disabled):hover {
+    color: var(--secondary-action-text) !important;
+    border-color: var(--secondary-action-hover) !important;
+    background: var(--secondary-action-hover) !important;
+}
+.monitor-actions .btn svg { width: 14px; height: 14px; }
+.monitoring-page .loading-box { margin-top: 0; }
+.monitoring-page .loading-head { font-size: .58rem; }
+
+/* Supporting cards */
+.monitor-info-heading {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--component-heading);
+    font-size: .66rem;
+    font-weight: 800;
+}
+.monitor-info-heading svg { width: 14px; height: 14px; }
+.monitor-info-card .ui-info-list { margin-top: 10px; }
+.monitor-help-card p { margin: 10px 0 0; color: var(--text-main); font-size: .61rem; line-height: 1.6; }
+
+/* Main monitoring table */
+.monitor-table-card { min-height: 560px; }
+.monitor-table-card .ui-card__body { padding: 16px; }
+.monitor-card-header { align-items: flex-start; margin-bottom: 9px; }
+.monitor-card-header .ui-card-header__copy p { max-width: 650px; }
+.monitor-orientation {
+    display: inline-flex;
+    flex: 0 0 auto;
+    padding: 3px;
+    border: 1px solid var(--border-color);
+    border-radius: 9px;
+    background: var(--bg-soft);
+}
+.monitor-orientation button {
+    min-height: 30px;
+    padding: 5px 10px;
+    border: 0;
+    border-radius: 7px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: .59rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+.monitor-orientation button svg { width: 13px; height: 13px; }
+.monitor-orientation button.active {
+    color: var(--text-strong);
+    background: var(--surface-raised);
+    box-shadow: var(--shadow-xs);
+}
+.monitor-status-row {
+    min-height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+.monitor-status-row .status { margin: 0; font-size: .6rem; }
+.monitor-table-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--text-muted);
+    font-size: .56rem;
+    white-space: nowrap;
+}
+.monitor-table-hint svg { width: 12px; height: 12px; color: var(--component-icon); }
+
+.monitor-table-wrap {
+    overflow-x: auto;
+    overflow-y: auto;
+    position: relative;
+    max-height: 72vh;
+    min-height: 470px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background: var(--card-bg);
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-inline: contain;
+    scrollbar-gutter: stable;
+}
+.monitor-table-wrap table {
+    width: max-content;
+    min-width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--card-bg);
+}
+.monitor-table-wrap th,
+.monitor-table-wrap td {
+    padding: 8px 10px;
+    border-right: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-main);
+    text-align: center;
+    font-size: .61rem;
+    white-space: nowrap;
+    background-clip: padding-box;
+}
+.monitor-table-wrap th:last-child,
+.monitor-table-wrap td:last-child { border-right: 0; }
+.monitor-table-wrap tbody tr:last-child td { border-bottom: 0; }
+.monitor-table-wrap th {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    height: 34px;
+    background: var(--table-head);
+    color: var(--text-strong);
+    font-size: .59rem;
+    font-weight: 800;
+}
+
+/* Two-level hourly header: only "Nama Pos" is sticky on the left. */
+.monitor-table-wrap table.monitor-hourly thead tr:first-child > th { top: 0; }
+.monitor-table-wrap table.monitor-hourly thead tr:nth-child(2) > th {
+    top: 34px;
+    left: auto !important;
+    z-index: 6;
+    background: color-mix(in srgb, var(--table-head) 88%, var(--surface-soft));
+}
+.monitor-table-wrap table.monitor-hourly thead tr:first-child > th:first-child,
+.monitor-table-wrap table:not(.monitor-hourly) thead tr:first-child > th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 14;
+    min-width: 190px;
+    width: 190px;
+    max-width: 190px;
+    text-align: left;
+    background: var(--table-head);
+    box-shadow: 2px 0 0 var(--border-color), 7px 0 12px -12px rgba(34,52,104,.6);
+}
+.monitor-table-wrap tbody td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    min-width: 190px;
+    width: 190px;
+    max-width: 190px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: var(--card-bg);
+    text-align: left;
+    font-weight: 800;
+    box-shadow: 2px 0 0 var(--border-color), 7px 0 12px -12px rgba(34,52,104,.48);
+}
+.monitor-table-wrap tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--bg-soft) 62%, var(--card-bg)); }
+.monitor-table-wrap tbody tr:nth-child(even) td:first-child { background: color-mix(in srgb, var(--bg-soft) 62%, var(--card-bg)); }
+.monitor-table-wrap tbody tr:hover td { background: var(--surface-soft); }
+.monitor-table-wrap tbody tr:hover td:first-child { background: var(--surface-soft); }
+.monitor-table-wrap .date-group { color: var(--component-heading); background: color-mix(in srgb, var(--surface-soft) 72%, var(--card-bg)); }
+.monitor-empty-cell {
+    height: 465px;
+    min-width: 520px;
+    white-space: normal !important;
+    text-align: center !important;
+    vertical-align: middle;
+    color: var(--text-muted) !important;
+}
+.monitor-empty-cell strong,
+.monitor-empty-cell small { display: block; }
+.monitor-empty-cell strong { margin-top: 8px; color: var(--text-strong); font-size: .75rem; }
+.monitor-empty-cell small { margin-top: 4px; font-size: .59rem; font-weight: 500; }
+.monitor-empty-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    color: var(--component-icon);
+    background: var(--icon-soft);
+}
+.monitor-empty-icon svg { width: 21px; height: 21px; }
+
+/* Summary */
+.monitor-summary-heading { margin-bottom: 0; }
+.monitor-summary-list { margin: 0; display: grid; gap: 9px; }
+.monitor-summary-list > div {
+    display: grid;
+    grid-template-columns: 82px minmax(0, 1fr);
+    align-items: start;
+    gap: 8px;
+}
+.monitor-summary-list dt { color: var(--text-muted); font-size: .58rem; }
+.monitor-summary-list dd {
+    margin: 0;
+    color: var(--text-strong);
+    font-size: .6rem;
+    font-weight: 800;
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+.monitor-range-value {
+    padding: 10px 11px;
+    border: 1px solid var(--border-color);
+    border-radius: 9px;
+    background: var(--bg-soft);
+    color: var(--text-strong);
+    text-align: center;
+    font-size: .61rem;
+    font-weight: 800;
+    line-height: 1.55;
+}
+.monitor-extreme-grid,
+.monitor-status-cards { display: grid; gap: 8px; }
+
+
+@media (max-width: 1040px) {
+    .monitor-summary-card { min-width: 0; }
+}
+@media (max-width: 780px) {
+    .monitor-card-header { flex-direction: column; align-items: stretch; }
+    .monitor-orientation { align-self: flex-start; }
+    .monitor-table-card { min-height: 430px; }
+    .monitor-table-wrap { min-height: 380px; max-height: 66vh; }
+    .monitor-status-row { align-items: flex-start; flex-direction: column; }
+    .monitor-table-hint { white-space: normal; }
+}
+@media (max-width: 520px) {
+    .monitoring-page .period-detail { grid-template-columns: 1fr; gap: 10px; }
+    .monitor-summary-list > div { grid-template-columns: 94px minmax(0, 1fr); }
+    .monitor-table-wrap table.monitor-hourly thead tr:first-child > th:first-child,
+    .monitor-table-wrap table:not(.monitor-hourly) thead tr:first-child > th:first-child,
+    .monitor-table-wrap tbody td:first-child { min-width: 158px; width: 158px; max-width: 158px; }
+}
+
+/* Ringkasan puncak hujan: dua tabel independen dan scrollable. */
+.monitor-peak-table .ui-summary-table__scroll { max-height: 220px; }
+
+/* ============================================================
+   Ringkasan tertinggi — compact auto-width + klasifikasi hujan
+   ============================================================ */
+.monitor-peak-table .ui-summary-table__scroll {
+    max-height: 220px;
+    width: 100%;
+    overflow: auto;
+}
+.monitor-peak-table table {
+    width: max-content;
+    min-width: 0;
+    max-width: none;
+    table-layout: auto;
+}
+.monitor-peak-table th,
+.monitor-peak-table td {
+    width: auto;
+    max-width: none;
+}
+.monitor-peak-table th:first-child,
+.monitor-peak-table td:first-child { min-width: 112px; }
+.monitor-peak-table th:nth-child(2),
+.monitor-peak-table td:nth-child(2) { min-width: 104px; }
+.monitor-peak-table th:last-child,
+.monitor-peak-table td:last-child { min-width: 106px; }
+.monitor-peak-table .peak-value { font-variant-numeric: tabular-nums; }
+
+.monitor-peak-table .rain-class {
+    color: #07111F;
+    font-weight: 800;
+}
+.monitor-peak-table .rain-class--light { background: #00DE20; }
+.monitor-peak-table .rain-class--moderate { background: #FDF900; }
+.monitor-peak-table .rain-class--heavy { background: #FD9500; }
+.monitor-peak-table .rain-class--very-heavy { background: #FF0400; }
+.monitor-peak-table .rain-class--extreme { background: #EA11F4; }
+
+/* Klasifikasi warna juga berlaku pada nilai di Data Monitoring Terpadu. */
+.monitor-table-wrap td.rain-class {
+    color: #07111F !important;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+.monitor-table-wrap td.rain-class--light { background: #00DE20 !important; }
+.monitor-table-wrap td.rain-class--moderate { background: #FDF900 !important; }
+.monitor-table-wrap td.rain-class--heavy { background: #FD9500 !important; }
+.monitor-table-wrap td.rain-class--very-heavy { background: #FF0400 !important; }
+.monitor-table-wrap td.rain-class--extreme { background: #EA11F4 !important; }
+
+.rain-classification-card {
+    margin-top: 0;
+}
+.rain-classification-card[hidden] { display: none !important; }
+.rain-classification-heading {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 12px;
+}
+.rain-classification-heading__icon {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    flex: 0 0 30px;
+    border-radius: 9px;
+    color: var(--component-icon);
+    background: var(--icon-soft);
+}
+.rain-classification-heading__icon svg { width: 15px; height: 15px; }
+.rain-classification-heading > div { min-width: 0; display: grid; gap: 2px; }
+.rain-classification-heading strong {
+    color: var(--text-strong);
+    font-size: .68rem;
+    font-weight: 800;
+}
+.rain-classification-heading small {
+    color: var(--text-muted);
+    font-size: .58rem;
+    line-height: 1.45;
+}
+.rain-classification-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+.rain-classification-group {
+    min-width: 0;
+    padding: 11px;
+    border: 1px solid var(--border-color);
+    border-radius: 11px;
+    background: var(--surface-raised);
+}
+.rain-classification-group h3 {
+    margin: 0 0 9px;
+    color: var(--text-strong);
+    font-size: .62rem;
+    font-weight: 800;
+}
+.rain-classification-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px 10px;
+}
+.rain-classification-items span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--text-main);
+    font-size: .56rem;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+.rain-classification-items i {
+    width: 10px;
+    height: 10px;
+    flex: 0 0 10px;
+    border: 1px solid color-mix(in srgb, var(--rain-class), #07111F 18%);
+    border-radius: 3px;
+    background: var(--rain-class);
+}
+.rain-classification-items b {
+    color: var(--text-muted);
+    font-weight: 700;
+}
+
+@media (max-width: 780px) {
+    .rain-classification-grid { grid-template-columns: 1fr; }
+}

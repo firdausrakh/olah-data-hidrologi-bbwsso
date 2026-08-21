@@ -1,0 +1,42 @@
+[
+  {
+    "kd_hardware": "4101",
+    "name": "Penungkulan",
+    "location_original": "Penungkulan",
+    "nm_logger": "",
+    "station_type": "rain_gauge",
+    "logger_id": "9"
+  },
+  {
+    "kd_hardware": "4102",
+    "name": "Kutoarjo",
+    "location_original": "Kutoarjo",
+    "nm_logger": "",
+    "station_type": "rain_gauge",
+    "logger_id": "9"
+  },
+  {
+    "kd_hardware": "4104",
+    "name": "Sempor",
+    "location_original": "Sempor",
+    "nm_logger": "",
+    "station_type": "rain_gauge",
+    "logger_id": "8"
+  },
+  {
+    "kd_hardware": "4105",
+    "name": "Bintaran",
+    "location_original": "Bintaran",
+    "nm_logger": "",
+    "station_type": "water_level",
+    "logger_id": "8"
+  },
+  {
+    "kd_hardware": "4106",
+    "name": "Sermo",
+    "location_original": "Sermo",
+    "nm_logger": "",
+    "station_type": "climatology",
+    "logger_id": "9"
+  }
+]

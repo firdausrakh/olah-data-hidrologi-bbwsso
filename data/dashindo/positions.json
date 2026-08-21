@@ -1,0 +1,146 @@
+[
+  {
+    "id": "300",
+    "device": "SOWL025",
+    "field": "tma",
+    "name": "Bengkok",
+    "source_name": "Sungai Bengkok",
+    "group": "hulu",
+    "unit": "m"
+  },
+  {
+    "id": "168",
+    "device": "SOWL007",
+    "field": "tma",
+    "name": "Clereng",
+    "source_name": "Pos Muka Air Clereng",
+    "group": "hilir",
+    "unit": "m"
+  },
+  {
+    "id": "299",
+    "device": "SOWL024",
+    "field": "tma",
+    "name": "Ngrancah 2",
+    "source_name": "Sungai Ngrancah",
+    "group": "hulu",
+    "unit": "m"
+  },
+  {
+    "id": "142",
+    "device": "SOWL011",
+    "field": "tma1",
+    "name": "Pekik Jamal",
+    "source_name": "Pekik Jamal Sungai",
+    "group": "hilir",
+    "unit": "m"
+  },
+  {
+    "id": "215",
+    "device": "SOWL018",
+    "field": "tma1",
+    "name": "Pengasih",
+    "source_name": "Pengasih Sungai Utama",
+    "group": "hilir",
+    "unit": "m"
+  },
+  {
+    "id": "99",
+    "device": "SOWL013",
+    "field": "tma1",
+    "name": "Safari",
+    "source_name": "AWLR Bendung Safari",
+    "group": "hilir",
+    "unit": "m"
+  },
+  {
+    "id": "171",
+    "device": "SOWL008",
+    "field": "tma",
+    "name": "Secang",
+    "source_name": "Pos Muka Air Secang Sungai",
+    "group": "hilir",
+    "unit": "m"
+  },
+  {
+    "id": "64",
+    "device": "SOWL010",
+    "field": "tma1",
+    "name": "Sermo Outflow",
+    "source_name": "Bangunan Ukur Ambang Lebar",
+    "group": "hilir",
+    "unit": "m"
+  },
+  {
+    "id": "83",
+    "device": "SOWL001",
+    "field": "tma1",
+    "name": "Sermo Waduk",
+    "source_name": "AWLR intake",
+    "group": "waduk",
+    "unit": "mdpl"
+  },
+  {
+    "id": "60",
+    "device": "SOWL009",
+    "field": "tma",
+    "name": "Kamal Irigasi Kanan",
+    "source_name": "Bendung Kamal Irigasi Kanan",
+    "group": "hilir",
+    "unit": "m"
+  },
+  {
+    "id": "58",
+    "device": "SOWL005",
+    "field": "tma",
+    "name": "Kamal Irigasi Kiri",
+    "source_name": "Bendung Kamal Irigasi Kiri",
+    "group": "hilir",
+    "unit": "m"
+  },
+  {
+    "id": "92",
+    "device": "SOWL016",
+    "field": "tma1",
+    "name": "Pekik Jamal Irigasi Wojowalur",
+    "source_name": "Pekik Jamal Irigasi Wojowalur",
+    "group": "hilir",
+    "unit": "m"
+  },
+  {
+    "id": "214",
+    "device": "SOWL017",
+    "field": "tma1",
+    "name": "Pengasih Irigasi",
+    "source_name": "Pengasih Irigasi",
+    "group": "hilir",
+    "unit": "m"
+  },
+  {
+    "id": "91",
+    "device": "SOWL014",
+    "field": "tmaikn",
+    "name": "Safari Irigasi Kanan",
+    "source_name": "Safari Irigasi Kanan",
+    "group": "hilir",
+    "unit": "m"
+  },
+  {
+    "id": "93",
+    "device": "SOWL015",
+    "field": "tmaikr",
+    "name": "Safari Irigasi Kiri",
+    "source_name": "Safari Irigasi Kiri",
+    "group": "hilir",
+    "unit": "m"
+  },
+  {
+    "id": "172",
+    "device": "SOWL008",
+    "field": "tma2",
+    "name": "Secang Irigasi",
+    "source_name": "Pos Muka Air Secang Irigasi",
+    "group": "hilir",
+    "unit": "m"
+  }
+]

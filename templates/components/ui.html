@@ -1,0 +1,90 @@
+{# Shared UI primitives for Pengolahan and Monitoring. #}
+
+{% macro three_column_layout(classes='', left_aria='', center_aria='', right_aria='', left_classes='', center_classes='', right_classes='') -%}
+<div class="ui-three-column {{ classes }}">
+    <aside class="ui-three-column__column ui-three-column__left {{ left_classes }}"{% if left_aria %} aria-label="{{ left_aria }}"{% endif %}>
+        {{ caller('left') }}
+    </aside>
+    <section class="ui-three-column__column ui-three-column__center {{ center_classes }}"{% if center_aria %} aria-label="{{ center_aria }}"{% endif %}>
+        {{ caller('center') }}
+    </section>
+    <aside class="ui-three-column__column ui-three-column__right {{ right_classes }}"{% if right_aria %} aria-label="{{ right_aria }}"{% endif %}>
+        {{ caller('right') }}
+    </aside>
+</div>
+{%- endmacro %}
+
+
+{% macro card(classes='', id='', aria_label='', body_class='', hidden=false) -%}
+<section{% if id %} id="{{ id }}"{% endif %} class="card ui-card {{ classes }}"{% if aria_label %} aria-label="{{ aria_label }}"{% endif %}{% if hidden %} hidden{% endif %}>
+    <div class="ui-card__body {{ body_class }}">
+        {{ caller() }}
+    </div>
+</section>
+{%- endmacro %}
+
+{% macro card_header(title, description='', icon='layout-dashboard', icon_variant='box', heading='h2', classes='', title_id='', description_id='') -%}
+<header class="ui-card-header {{ classes }}">
+    <div class="ui-card-header__main">
+        <span class="ui-card-header__icon ui-card-header__icon--{{ icon_variant }}" aria-hidden="true"><i data-lucide="{{ icon }}"></i></span>
+        <div class="ui-card-header__copy">
+            <{{ heading }}{% if title_id %} id="{{ title_id }}"{% endif %}>{{ title }}</{{ heading }}>
+            {% if description %}<p{% if description_id %} id="{{ description_id }}"{% endif %}>{{ description }}</p>{% endif %}
+        </div>
+    </div>
+    {% if caller is defined %}
+    <div class="ui-card-header__actions">{{ caller() }}</div>
+    {% endif %}
+</header>
+{%- endmacro %}
+
+{% macro field(label, for_id='', help='', classes='', label_id='', wrapper_id='') -%}
+<div{% if wrapper_id %} id="{{ wrapper_id }}"{% endif %} class="form-group ui-field {{ classes }}">
+    <label{% if for_id %} for="{{ for_id }}"{% endif %}{% if label_id %} id="{{ label_id }}"{% endif %}{% if help %} data-help="{{ help }}"{% endif %}>{{ label|safe }}</label>
+    {{ caller() }}
+</div>
+{%- endmacro %}
+
+{% macro stat_card(title, value_id, unit_id, meta_id, icon='gauge', variant='neutral', icon_id='', title_id='', meta_icon='clock-3', classes='') -%}
+<article class="ui-stat-card ui-stat-card--{{ variant }} {{ classes }}">
+    <span class="ui-stat-card__icon" aria-hidden="true"><i{% if icon_id %} id="{{ icon_id }}"{% endif %} data-lucide="{{ icon }}"></i></span>
+    <div class="ui-stat-card__content">
+        <span class="ui-stat-card__label"{% if title_id %} id="{{ title_id }}"{% endif %}>{{ title }}</span>
+        <div class="ui-stat-card__value"><strong id="{{ value_id }}">—</strong><em class="unit" id="{{ unit_id }}"></em></div>
+        <small><i data-lucide="{{ meta_icon }}"></i><span id="{{ meta_id }}">Belum ada data</span></small>
+    </div>
+</article>
+{%- endmacro %}
+
+{% macro status_card(title, value_id, icon='circle-check-big', variant='success', description='', classes='') -%}
+<article class="ui-status-card ui-status-card--{{ variant }} {{ classes }}">
+    <span class="ui-status-card__icon" aria-hidden="true"><i data-lucide="{{ icon }}"></i></span>
+    <div class="ui-status-card__content">
+        <span>{{ title }}</span>
+        <strong id="{{ value_id }}">—</strong>
+        {% if description %}<small>{{ description }}</small>{% endif %}
+    </div>
+</article>
+{%- endmacro %}
+
+
+{% macro summary_table(title, icon, table_id, body_id, download_id, headers, classes='', title_id='') -%}
+<div class="ui-summary-table {{ classes }}">
+    <div class="ui-summary-table__head">
+        <h4{% if title_id %} id="{{ title_id }}"{% endif %}><i data-lucide="{{ icon }}"></i><span>{{ title }}</span></h4>
+        <button class="ui-summary-table__download" id="{{ download_id }}" type="button" disabled title="Unduh Excel">
+            <i data-lucide="file-down"></i><span>Excel</span>
+        </button>
+    </div>
+    <div class="ui-summary-table__scroll">
+        <table id="{{ table_id }}">
+            <thead><tr>{% for header in headers %}<th>{{ header }}</th>{% endfor %}</tr></thead>
+            <tbody id="{{ body_id }}"><tr><td colspan="{{ headers|length }}" class="ui-summary-table__empty">Belum ada data.</td></tr></tbody>
+        </table>
+    </div>
+</div>
+{%- endmacro %}
+
+{% macro info_item(icon, text) -%}
+<div class="ui-info-item"><span aria-hidden="true"><i data-lucide="{{ icon }}"></i></span><div>{{ text|safe }}</div></div>
+{%- endmacro %}

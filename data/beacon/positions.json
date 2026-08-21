@@ -1,0 +1,374 @@
+[
+  {
+    "id_logger": "10001_psda",
+    "name": "Pos AWR Kaliurang"
+  },
+  {
+    "id_logger": "10002_psda",
+    "name": "Pos ARR Bronggang"
+  },
+  {
+    "id_logger": "10003_psda",
+    "name": "Pos ARR Kemput"
+  },
+  {
+    "id_logger": "10007_bbws",
+    "name": "Pos Klimatologi Karang Kobar"
+  },
+  {
+    "id_logger": "10013_psda",
+    "name": "Pos ARR Kali Bawang"
+  },
+  {
+    "id_logger": "10014_psda",
+    "name": "Pos AWLR Seturan"
+  },
+  {
+    "id_logger": "10015_psda",
+    "name": "Pos AWLR Papringan"
+  },
+  {
+    "id_logger": "10016_psda",
+    "name": "Pos AWLR Pogung"
+  },
+  {
+    "id_logger": "10017_psda",
+    "name": "Pos AWLR Sinduadi"
+  },
+  {
+    "id_logger": "10020_psda",
+    "name": "Pos AWLR Bendungan"
+  },
+  {
+    "id_logger": "10021_psda",
+    "name": "Pos AWLR Opak Pulo"
+  },
+  {
+    "id_logger": "10022_psda",
+    "name": "Pos AWLR Bantar"
+  },
+  {
+    "id_logger": "10023_psda",
+    "name": "Pos AWLR Kedungmiri"
+  },
+  {
+    "id_logger": "10024_psda",
+    "name": "Pos AWLR Bunder"
+  },
+  {
+    "id_logger": "10026_psda",
+    "name": "Pos ARR Gemawang"
+  },
+  {
+    "id_logger": "10027_psda",
+    "name": "Pos ARR Singkung"
+  },
+  {
+    "id_logger": "10028_psda",
+    "name": "Pos ARR Sapon"
+  },
+  {
+    "id_logger": "10029_psda",
+    "name": "Pos ARR Hargorejo"
+  },
+  {
+    "id_logger": "10030_psda",
+    "name": "Pos ARR Sanden"
+  },
+  {
+    "id_logger": "10031_psda",
+    "name": "Pos ARR Ngawen"
+  },
+  {
+    "id_logger": "10032_psda",
+    "name": "Pos ARR Angin-Angin"
+  },
+  {
+    "id_logger": "10033_psda",
+    "name": "Pos ARR Seyegan"
+  },
+  {
+    "id_logger": "10034_psda",
+    "name": "Pos ARR Godean"
+  },
+  {
+    "id_logger": "10035_psda",
+    "name": "Pos ARR Prumpung"
+  },
+  {
+    "id_logger": "10036_psda",
+    "name": "Pos ARR Giriwungu"
+  },
+  {
+    "id_logger": "10037_psda",
+    "name": "Pos ARR Borrowarea"
+  },
+  {
+    "id_logger": "10038_psda",
+    "name": "Pos ARR Terong"
+  },
+  {
+    "id_logger": "10039_psda",
+    "name": "Pos ARR Kedungkeris"
+  },
+  {
+    "id_logger": "10040_psda",
+    "name": "Pos AWR Barongan"
+  },
+  {
+    "id_logger": "10044_bbws",
+    "name": "Pos AWLR Karang Talun"
+  },
+  {
+    "id_logger": "10045_bbws",
+    "name": "Pos ARR Soropadan"
+  },
+  {
+    "id_logger": "10048_bbws",
+    "name": "Pos ARR Surotrunan"
+  },
+  {
+    "id_logger": "10049_bbws",
+    "name": "Pos ARR Sindut"
+  },
+  {
+    "id_logger": "10050_bbws",
+    "name": "Pos ARR Adimulyo"
+  },
+  {
+    "id_logger": "10051_bbws",
+    "name": "Pos AWLR Butuh"
+  },
+  {
+    "id_logger": "10052_bbws",
+    "name": "Pos AWLR Gombong"
+  },
+  {
+    "id_logger": "10053_bbws",
+    "name": "Pos ARR Slinga"
+  },
+  {
+    "id_logger": "10054_bbws",
+    "name": "Pos ARR Bendung Tajum"
+  },
+  {
+    "id_logger": "10055_bbws",
+    "name": "Pos ARR Kaligending"
+  },
+  {
+    "id_logger": "10056_bbws",
+    "name": "Pos ARR Bener"
+  },
+  {
+    "id_logger": "10057_psda",
+    "name": "Pos AWLR Pengasih"
+  },
+  {
+    "id_logger": "10058_psda",
+    "name": "Pos AWLR Kali Bawang"
+  },
+  {
+    "id_logger": "10062_bbws",
+    "name": "Pos AWLR Bendung Rebug"
+  },
+  {
+    "id_logger": "10063_bbws",
+    "name": "Pos AWLR Bendung Kali Meneng"
+  },
+  {
+    "id_logger": "10064_bbws",
+    "name": "Pos AWLR Bendung Kedung Gupit"
+  },
+  {
+    "id_logger": "10065_bbws",
+    "name": "Pos AWLR Bendung Merden"
+  },
+  {
+    "id_logger": "10066_bbws",
+    "name": "Pos AWLR Bendung Pasucen"
+  },
+  {
+    "id_logger": "10067_bbws",
+    "name": "Pos AWLR Bendung Rowokawuk"
+  },
+  {
+    "id_logger": "10068_bbws",
+    "name": "Pos AWLR Bendung Pangenrejo"
+  },
+  {
+    "id_logger": "10069_bbws",
+    "name": "Pos ARR Kedung Gupit"
+  },
+  {
+    "id_logger": "10070_bbws",
+    "name": "Pos ARR Mangunranan"
+  },
+  {
+    "id_logger": "10071_bbws",
+    "name": "Pos ARR Arjowinangun"
+  },
+  {
+    "id_logger": "10072_bbws",
+    "name": "Pos ARR Taman Winangun"
+  },
+  {
+    "id_logger": "10073_bbws",
+    "name": "Pos ARR Watu Barut"
+  },
+  {
+    "id_logger": "10074_bbws",
+    "name": "Pos AWS Wadas Lintang"
+  },
+  {
+    "id_logger": "10089_psda",
+    "name": "Pos AWLR Wonokromo"
+  },
+  {
+    "id_logger": "10090_psda",
+    "name": "Pos AWLR Sapon"
+  },
+  {
+    "id_logger": "10093_bbws",
+    "name": "Pos ARR Pundong"
+  },
+  {
+    "id_logger": "10094_psda",
+    "name": "Pos AWR Tegal"
+  },
+  {
+    "id_logger": "10111_psda",
+    "name": "Pos ARR Beran"
+  },
+  {
+    "id_logger": "10112_psda",
+    "name": "Pos ARR Gembongan"
+  },
+  {
+    "id_logger": "10113_psda",
+    "name": "Pos ARR Santan"
+  },
+  {
+    "id_logger": "10114_psda",
+    "name": "Pos ARR Plataran"
+  },
+  {
+    "id_logger": "10114_psda",
+    "name": "Pos AWLR Plataran"
+  },
+  {
+    "id_logger": "10117_bbws",
+    "name": "Pos AWLR Kediri"
+  },
+  {
+    "id_logger": "10118_bbws",
+    "name": "Pos AWLR Slinga"
+  },
+  {
+    "id_logger": "10119_bbws",
+    "name": "Pos AWLR Bulurejo"
+  },
+  {
+    "id_logger": "10120_bbws",
+    "name": "Pos AWLR Kedungbenda"
+  },
+  {
+    "id_logger": "10121_bbws",
+    "name": "Pos AWLR Kedungweru"
+  },
+  {
+    "id_logger": "10122_bbws",
+    "name": "Pos AWLR Karangturi"
+  },
+  {
+    "id_logger": "10133_bbws",
+    "name": "Pos AWLR Hulu Bener"
+  },
+  {
+    "id_logger": "10151_bbws",
+    "name": "Pos AWS Pejengkolan"
+  },
+  {
+    "id_logger": "10152_bbws",
+    "name": "Pos ARR Sumingkir"
+  },
+  {
+    "id_logger": "10206_psda",
+    "name": "Pos ARR Nyemengan"
+  },
+  {
+    "id_logger": "10207_psda",
+    "name": "Pos ARR Gedhangan"
+  },
+  {
+    "id_logger": "10211_bbws",
+    "name": "Pos AWLR Ketiwijayan"
+  },
+  {
+    "id_logger": "10223_bbws",
+    "name": "Pos AWLR Kolam Retensi Karangwuni"
+  },
+  {
+    "id_logger": "10247_bbws_371",
+    "name": "Pos AWLR Carik Barat"
+  },
+  {
+    "id_logger": "10247_bbws_372",
+    "name": "Pos AWLR Sungai Bogowonto"
+  },
+  {
+    "id_logger": "10248_bbws",
+    "name": "Pos ARR Kolam Retensi Lereng"
+  },
+  {
+    "id_logger": "10249_bbws",
+    "name": "Pos AFMR Bapangsari"
+  },
+  {
+    "id_logger": "10250_bbws",
+    "name": "Pos ARR Sendang Tirto"
+  },
+  {
+    "id_logger": "10255_psda",
+    "name": "Pos AWR Beji"
+  },
+  {
+    "id_logger": "10288_bbws",
+    "name": "Pos AWLR Gumingsir"
+  },
+  {
+    "id_logger": "10289_bbws",
+    "name": "Pos AWLR Jembatan Ngapak"
+  },
+  {
+    "id_logger": "10290_bbws",
+    "name": "Pos ARR Kaliori"
+  },
+  {
+    "id_logger": "10311_psda",
+    "name": "Pos AWLR Gumuk"
+  },
+  {
+    "id_logger": "10344_bbws",
+    "name": "Pos ARR Watuagung"
+  },
+  {
+    "id_logger": "10345_bbws",
+    "name": "Pos AWLR Kaliori"
+  },
+  {
+    "id_logger": "10346_bbws",
+    "name": "Pos AWLR Madurejo"
+  },
+  {
+    "id_logger": "10347_bbws",
+    "name": "Pos ARR Sidamulya"
+  },
+  {
+    "id_logger": "10348_bbws",
+    "name": "Pos ARR Logandeng"
+  },
+  {
+    "id_logger": "10358_bbws",
+    "name": "Pos AWLR Ngrancah"
+  }
+]

@@ -1,0 +1,2761 @@
+{
+  "10022_psda": [
+    {
+      "id": "145",
+      "name": "Tinggi Muka Air",
+      "type": "water_level"
+    },
+    {
+      "id": "325",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "146",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "147",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10050_bbws": [
+    {
+      "id": "180",
+      "name": "Precipitation Intensity",
+      "type": "rainfall"
+    },
+    {
+      "id": "181",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "182",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "183",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10249_bbws": [
+    {
+      "id": "375",
+      "name": "Luas Penampang Basah",
+      "type": "other"
+    },
+    {
+      "id": "373",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "343",
+      "name": "Flow Velocity",
+      "type": "other"
+    },
+    {
+      "id": "337",
+      "name": "Elevasi Muka Air",
+      "type": "water_level"
+    },
+    {
+      "id": "336",
+      "name": "Jarak Sensor",
+      "type": "other"
+    },
+    {
+      "id": "338",
+      "name": "Elevasi Sensor",
+      "type": "other"
+    },
+    {
+      "id": "344",
+      "name": "Precipitation Intensity",
+      "type": "rainfall"
+    },
+    {
+      "id": "335",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "334",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "333",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10040_psda": [
+    {
+      "id": "294",
+      "name": "Kecepatan Angin",
+      "type": "other"
+    },
+    {
+      "id": "295",
+      "name": "Arah Angin",
+      "type": "other"
+    },
+    {
+      "id": "296",
+      "name": "Temperatur Udara",
+      "type": "temperature"
+    },
+    {
+      "id": "297",
+      "name": "Kelembaban Udara",
+      "type": "other"
+    },
+    {
+      "id": "298",
+      "name": "Tekanan Udara",
+      "type": "other"
+    },
+    {
+      "id": "299",
+      "name": "Kecerahan",
+      "type": "other"
+    },
+    {
+      "id": "300",
+      "name": "Arah Cahaya",
+      "type": "other"
+    },
+    {
+      "id": "301",
+      "name": "Curah Hujan 1",
+      "type": "rainfall"
+    },
+    {
+      "id": "302",
+      "name": "Curah Hujan 2",
+      "type": "rainfall"
+    },
+    {
+      "id": "303",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "304",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10255_psda": [
+    {
+      "id": "629",
+      "name": "Kecepatan Angin",
+      "type": "other"
+    },
+    {
+      "id": "630",
+      "name": "Arah Angin",
+      "type": "other"
+    },
+    {
+      "id": "631",
+      "name": "Temperatur Udara",
+      "type": "temperature"
+    },
+    {
+      "id": "632",
+      "name": "Kelembaban Udara",
+      "type": "other"
+    },
+    {
+      "id": "633",
+      "name": "Tekanan Udara",
+      "type": "other"
+    },
+    {
+      "id": "634",
+      "name": "Kecerahan",
+      "type": "other"
+    },
+    {
+      "id": "635",
+      "name": "Arah Cahaya",
+      "type": "other"
+    },
+    {
+      "id": "636",
+      "name": "Curah Hujan",
+      "type": "rainfall"
+    },
+    {
+      "id": "640",
+      "name": "Kelembaban Logger",
+      "type": "other"
+    },
+    {
+      "id": "637",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "638",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10063_bbws": [
+    {
+      "id": "212",
+      "name": "Water Level",
+      "type": "water_level"
+    },
+    {
+      "id": "380",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "213",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "214",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "215",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10064_bbws": [
+    {
+      "id": "216",
+      "name": "Water Level",
+      "type": "water_level"
+    },
+    {
+      "id": "356",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "217",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "218",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "219",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10065_bbws": [
+    {
+      "id": "220",
+      "name": "Water Level",
+      "type": "water_level"
+    },
+    {
+      "id": "357",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "221",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "222",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "223",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10068_bbws": [
+    {
+      "id": "232",
+      "name": "Water Level",
+      "type": "water_level"
+    },
+    {
+      "id": "233",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "234",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "235",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10066_bbws": [
+    {
+      "id": "224",
+      "name": "Water Level",
+      "type": "water_level"
+    },
+    {
+      "id": "349",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "225",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "226",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "227",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10062_bbws": [
+    {
+      "id": "208",
+      "name": "Water Level",
+      "type": "water_level"
+    },
+    {
+      "id": "209",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "210",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "211",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10067_bbws": [
+    {
+      "id": "228",
+      "name": "Water Level",
+      "type": "water_level"
+    },
+    {
+      "id": "229",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "230",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "231",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10020_psda": [
+    {
+      "id": "139",
+      "name": "Tinggi Muka Air",
+      "type": "water_level"
+    },
+    {
+      "id": "323",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "140",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "141",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10119_bbws": [
+    {
+      "id": "279",
+      "name": "Water Level",
+      "type": "water_level"
+    },
+    {
+      "id": "346",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "280",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "281",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "282",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10024_psda": [
+    {
+      "id": "308",
+      "name": "Tinggi Muka Air",
+      "type": "water_level"
+    },
+    {
+      "id": "327",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "309",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "310",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10051_bbws": [
+    {
+      "id": "184",
+      "name": "Water Level",
+      "type": "water_level"
+    },
+    {
+      "id": "354",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "185",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "186",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "187",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10247_bbws_371": [
+    {
+      "id": "371",
+      "name": "Elv MA Carik Barat",
+      "type": "water_level"
+    },
+    {
+      "id": "330",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "331",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "332",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    },
+    {
+      "id": "329",
+      "name": "Curah Hujan",
+      "type": "rainfall"
+    }
+  ],
+  "10052_bbws": [
+    {
+      "id": "188",
+      "name": "Water Level",
+      "type": "water_level"
+    },
+    {
+      "id": "352",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "189",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "190",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "191",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10288_bbws": [
+    {
+      "id": "363",
+      "name": "Tinggi Muka Air",
+      "type": "water_level"
+    },
+    {
+      "id": "364",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "365",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "366",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10311_psda": [
+    {
+      "id": "647",
+      "name": "Tinggi Muka Air",
+      "type": "water_level"
+    },
+    {
+      "id": "646",
+      "name": "Kelembaban Logger",
+      "type": "other"
+    },
+    {
+      "id": "648",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "645",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10133_bbws": [
+    {
+      "id": "376",
+      "name": "Tinggi Muka Air",
+      "type": "water_level"
+    },
+    {
+      "id": "379",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "377",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "378",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10289_bbws": [
+    {
+      "id": "367",
+      "name": "Tinggi Muka Air",
+      "type": "water_level"
+    },
+    {
+      "id": "368",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "369",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "370",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10058_psda": [
+    {
+      "id": "340",
+      "name": "Tinggi Muka Air",
+      "type": "water_level"
+    },
+    {
+      "id": "341",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "342",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10345_bbws": [
+    {
+      "id": "385",
+      "name": "Tinggi Muka Air",
+      "type": "water_level"
+    },
+    {
+      "id": "386",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "387",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "388",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10001_psda": [
+    {
+      "id": "13",
+      "name": "Kecepatan Angin",
+      "type": "other"
+    },
+    {
+      "id": "14",
+      "name": "Arah Angin",
+      "type": "other"
+    },
+    {
+      "id": "15",
+      "name": "Temperatur Udara",
+      "type": "temperature"
+    },
+    {
+      "id": "16",
+      "name": "Kelembaban Udara",
+      "type": "other"
+    },
+    {
+      "id": "17",
+      "name": "Tekanan Udara",
+      "type": "other"
+    },
+    {
+      "id": "18",
+      "name": "Kecerahan",
+      "type": "other"
+    },
+    {
+      "id": "19",
+      "name": "Arah Cahaya",
+      "type": "other"
+    },
+    {
+      "id": "20",
+      "name": "Curah Hujan 1",
+      "type": "rainfall"
+    },
+    {
+      "id": "84",
+      "name": "Curah Hujan 2",
+      "type": "rainfall"
+    },
+    {
+      "id": "328",
+      "name": "Kelembaban Logger",
+      "type": "other"
+    },
+    {
+      "id": "21",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "22",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10044_bbws": [
+    {
+      "id": "165",
+      "name": "Water Level",
+      "type": "water_level"
+    },
+    {
+      "id": "407",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "167",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "168",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10122_bbws": [
+    {
+      "id": "291",
+      "name": "Water Level",
+      "type": "water_level"
+    },
+    {
+      "id": "353",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "292",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "293",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "294",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10117_bbws": [
+    {
+      "id": "271",
+      "name": "Water Level",
+      "type": "water_level"
+    },
+    {
+      "id": "351",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "272",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "273",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "274",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10120_bbws": [
+    {
+      "id": "283",
+      "name": "Water Level",
+      "type": "water_level"
+    },
+    {
+      "id": "347",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "284",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "285",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "286",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10023_psda": [
+    {
+      "id": "306",
+      "name": "Tinggi Muka Air",
+      "type": "water_level"
+    },
+    {
+      "id": "326",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "616",
+      "name": "Kelembaban Logger",
+      "type": "other"
+    },
+    {
+      "id": "305",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "307",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10121_bbws": [
+    {
+      "id": "287",
+      "name": "Water Level",
+      "type": "water_level"
+    },
+    {
+      "id": "348",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "288",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "289",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "290",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10211_bbws": [
+    {
+      "id": "315",
+      "name": "Water Level",
+      "type": "water_level"
+    },
+    {
+      "id": "314",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "316",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "313",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10223_bbws": [
+    {
+      "id": "1",
+      "name": "Tinggi Muka Air",
+      "type": "water_level"
+    },
+    {
+      "id": "130",
+      "name": "Curah Hujan",
+      "type": "rainfall"
+    },
+    {
+      "id": "140",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "141",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "142",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10346_bbws": [
+    {
+      "id": "397",
+      "name": "Tinggi Muka Air",
+      "type": "water_level"
+    },
+    {
+      "id": "406",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "398",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "399",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "400",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10358_bbws": [
+    {
+      "id": "401",
+      "name": "Tinggi Muka Air",
+      "type": "water_level"
+    },
+    {
+      "id": "405",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "402",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "403",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "404",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10021_psda": [
+    {
+      "id": "142",
+      "name": "Tinggi Muka Air",
+      "type": "water_level"
+    },
+    {
+      "id": "143",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "144",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10015_psda": [
+    {
+      "id": "106",
+      "name": "Tinggi Muka Air",
+      "type": "water_level"
+    },
+    {
+      "id": "319",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "107",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "108",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10057_psda": [
+    {
+      "id": "336",
+      "name": "Tinggi Muka Air",
+      "type": "water_level"
+    },
+    {
+      "id": "337",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "338",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "339",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10016_psda": [
+    {
+      "id": "109",
+      "name": "Tinggi Muka Air",
+      "type": "water_level"
+    },
+    {
+      "id": "320",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "110",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "111",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10090_psda": [
+    {
+      "id": "472",
+      "name": "Tinggi Muka Air",
+      "type": "water_level"
+    },
+    {
+      "id": "475",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "476",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10014_psda": [
+    {
+      "id": "103",
+      "name": "Tinggi Muka Air",
+      "type": "water_level"
+    },
+    {
+      "id": "318",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "104",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "105",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10017_psda": [
+    {
+      "id": "112",
+      "name": "Tinggi Muka Air",
+      "type": "water_level"
+    },
+    {
+      "id": "321",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "113",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "114",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10118_bbws": [
+    {
+      "id": "275",
+      "name": "Water Level",
+      "type": "water_level"
+    },
+    {
+      "id": "408",
+      "name": "Debit",
+      "type": "discharge"
+    },
+    {
+      "id": "276",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "277",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "278",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10247_bbws_372": [
+    {
+      "id": "372",
+      "name": "Elv MA Sungai Bogowonto",
+      "type": "water_level"
+    },
+    {
+      "id": "330",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "331",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "332",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    },
+    {
+      "id": "374",
+      "name": "Debit Aliran Sungai",
+      "type": "discharge"
+    }
+  ],
+  "10094_psda": [
+    {
+      "id": "482",
+      "name": "Kecepatan Angin",
+      "type": "other"
+    },
+    {
+      "id": "483",
+      "name": "Arah Angin",
+      "type": "other"
+    },
+    {
+      "id": "484",
+      "name": "Temperatur Udara",
+      "type": "temperature"
+    },
+    {
+      "id": "485",
+      "name": "Kelembaban Udara",
+      "type": "other"
+    },
+    {
+      "id": "486",
+      "name": "Tekanan Udara",
+      "type": "other"
+    },
+    {
+      "id": "487",
+      "name": "Kecerahan",
+      "type": "other"
+    },
+    {
+      "id": "488",
+      "name": "Arah Cahaya",
+      "type": "other"
+    },
+    {
+      "id": "489",
+      "name": "Curah Hujan 1",
+      "type": "rainfall"
+    },
+    {
+      "id": "490",
+      "name": "Evaporasi",
+      "type": "other"
+    },
+    {
+      "id": "499",
+      "name": "Kelembaban Logger",
+      "type": "other"
+    },
+    {
+      "id": "500",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "501",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10089_psda": [
+    {
+      "id": "467",
+      "name": "Tinggi Muka Air",
+      "type": "water_level"
+    },
+    {
+      "id": "470",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "471",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10032_psda": [
+    {
+      "id": "151",
+      "name": "Kecepatan Angin",
+      "type": "other"
+    },
+    {
+      "id": "152",
+      "name": "Arah Angin",
+      "type": "other"
+    },
+    {
+      "id": "156",
+      "name": "Kecerahan",
+      "type": "other"
+    },
+    {
+      "id": "157",
+      "name": "Arah Cahaya",
+      "type": "other"
+    },
+    {
+      "id": "158",
+      "name": "Curah Hujan 1",
+      "type": "rainfall"
+    },
+    {
+      "id": "159",
+      "name": "Curah Hujan 2",
+      "type": "rainfall"
+    },
+    {
+      "id": "160",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "161",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10071_bbws": [
+    {
+      "id": "244",
+      "name": "Precipitation Intensity",
+      "type": "rainfall"
+    },
+    {
+      "id": "245",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "246",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "247",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10054_bbws": [
+    {
+      "id": "196",
+      "name": "Precipitation Intensity",
+      "type": "rainfall"
+    },
+    {
+      "id": "197",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "198",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "199",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10037_psda": [
+    {
+      "id": "261",
+      "name": "Kecepatan Angin",
+      "type": "other"
+    },
+    {
+      "id": "262",
+      "name": "Arah Angin",
+      "type": "other"
+    },
+    {
+      "id": "266",
+      "name": "Kecerahan",
+      "type": "other"
+    },
+    {
+      "id": "267",
+      "name": "Arah Cahaya",
+      "type": "other"
+    },
+    {
+      "id": "268",
+      "name": "Curah Hujan 1",
+      "type": "rainfall"
+    },
+    {
+      "id": "269",
+      "name": "Curah Hujan 2",
+      "type": "rainfall"
+    },
+    {
+      "id": "270",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "271",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10111_psda": [
+    {
+      "id": "502",
+      "name": "Kecepatan Angin",
+      "type": "other"
+    },
+    {
+      "id": "503",
+      "name": "Arah Angin",
+      "type": "other"
+    },
+    {
+      "id": "504",
+      "name": "Kecerahan",
+      "type": "other"
+    },
+    {
+      "id": "505",
+      "name": "Arah Cahaya",
+      "type": "other"
+    },
+    {
+      "id": "506",
+      "name": "Curah Hujan",
+      "type": "rainfall"
+    },
+    {
+      "id": "507",
+      "name": "Kelembaban Logger",
+      "type": "other"
+    },
+    {
+      "id": "508",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "509",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10056_bbws": [
+    {
+      "id": "204",
+      "name": "Precipitation Intensity",
+      "type": "rainfall"
+    },
+    {
+      "id": "205",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "206",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "207",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10207_psda": [
+    {
+      "id": "617",
+      "name": "Curah Hujan",
+      "type": "rainfall"
+    },
+    {
+      "id": "619",
+      "name": "Kelembaban Logger",
+      "type": "other"
+    },
+    {
+      "id": "620",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "618",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10002_psda": [
+    {
+      "id": "23",
+      "name": "Kecepatan Angin",
+      "type": "other"
+    },
+    {
+      "id": "24",
+      "name": "Arah Angin",
+      "type": "other"
+    },
+    {
+      "id": "28",
+      "name": "Kecerahan",
+      "type": "other"
+    },
+    {
+      "id": "29",
+      "name": "Arah Cahaya",
+      "type": "other"
+    },
+    {
+      "id": "30",
+      "name": "Curah Hujan 1",
+      "type": "rainfall"
+    },
+    {
+      "id": "96",
+      "name": "Curah Hujan 2",
+      "type": "rainfall"
+    },
+    {
+      "id": "31",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "32",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10112_psda": [
+    {
+      "id": "510",
+      "name": "Curah Hujan",
+      "type": "rainfall"
+    },
+    {
+      "id": "511",
+      "name": "Kelembaban Logger",
+      "type": "other"
+    },
+    {
+      "id": "512",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "513",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10036_psda": [
+    {
+      "id": "250",
+      "name": "Kecepatan Angin",
+      "type": "other"
+    },
+    {
+      "id": "251",
+      "name": "Arah Angin",
+      "type": "other"
+    },
+    {
+      "id": "255",
+      "name": "Kecerahan",
+      "type": "other"
+    },
+    {
+      "id": "256",
+      "name": "Arah Cahaya",
+      "type": "other"
+    },
+    {
+      "id": "257",
+      "name": "Curah Hujan 1",
+      "type": "rainfall"
+    },
+    {
+      "id": "258",
+      "name": "Curah Hujan 2",
+      "type": "rainfall"
+    },
+    {
+      "id": "259",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "260",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10026_psda": [
+    {
+      "id": "125",
+      "name": "Kecepatan Angin",
+      "type": "other"
+    },
+    {
+      "id": "126",
+      "name": "Arah Angin",
+      "type": "other"
+    },
+    {
+      "id": "130",
+      "name": "Kecerahan",
+      "type": "other"
+    },
+    {
+      "id": "131",
+      "name": "Arah Cahaya",
+      "type": "other"
+    },
+    {
+      "id": "132",
+      "name": "Curah Hujan 1",
+      "type": "rainfall"
+    },
+    {
+      "id": "133",
+      "name": "Curah Hujan 2",
+      "type": "rainfall"
+    },
+    {
+      "id": "134",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "135",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10029_psda": [
+    {
+      "id": "217",
+      "name": "Kecepatan Angin",
+      "type": "other"
+    },
+    {
+      "id": "218",
+      "name": "Arah Angin",
+      "type": "other"
+    },
+    {
+      "id": "222",
+      "name": "Kecerahan",
+      "type": "other"
+    },
+    {
+      "id": "223",
+      "name": "Arah Cahaya",
+      "type": "other"
+    },
+    {
+      "id": "224",
+      "name": "Curah Hujan 1",
+      "type": "rainfall"
+    },
+    {
+      "id": "225",
+      "name": "Curah Hujan 2",
+      "type": "rainfall"
+    },
+    {
+      "id": "226",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "227",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10013_psda": [
+    {
+      "id": "74",
+      "name": "Kecepatan Angin",
+      "type": "other"
+    },
+    {
+      "id": "75",
+      "name": "Arah Angin",
+      "type": "other"
+    },
+    {
+      "id": "79",
+      "name": "Kecerahan",
+      "type": "other"
+    },
+    {
+      "id": "80",
+      "name": "Arah Cahaya",
+      "type": "other"
+    },
+    {
+      "id": "81",
+      "name": "Curah Hujan 1",
+      "type": "rainfall"
+    },
+    {
+      "id": "98",
+      "name": "Curah Hujan 2",
+      "type": "rainfall"
+    },
+    {
+      "id": "82",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "83",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10034_psda": [
+    {
+      "id": "184",
+      "name": "Kecepatan Angin",
+      "type": "other"
+    },
+    {
+      "id": "185",
+      "name": "Arah Angin",
+      "type": "other"
+    },
+    {
+      "id": "189",
+      "name": "Kecerahan",
+      "type": "other"
+    },
+    {
+      "id": "190",
+      "name": "Arah Cahaya",
+      "type": "other"
+    },
+    {
+      "id": "191",
+      "name": "Curah Hujan 1",
+      "type": "rainfall"
+    },
+    {
+      "id": "192",
+      "name": "Curah Hujan 2",
+      "type": "rainfall"
+    },
+    {
+      "id": "193",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "194",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10290_bbws": [
+    {
+      "id": "359",
+      "name": "Precipitation Intensity",
+      "type": "rainfall"
+    },
+    {
+      "id": "360",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "361",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "362",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10069_bbws": [
+    {
+      "id": "236",
+      "name": "Precipitation Intensity",
+      "type": "rainfall"
+    },
+    {
+      "id": "237",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "238",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "239",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10055_bbws": [
+    {
+      "id": "200",
+      "name": "Precipitation Intensity",
+      "type": "rainfall"
+    },
+    {
+      "id": "201",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "202",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "203",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10007_bbws": [
+    {
+      "id": "151",
+      "name": "Wind Speed",
+      "type": "other"
+    },
+    {
+      "id": "152",
+      "name": "Wind Direction",
+      "type": "other"
+    },
+    {
+      "id": "153",
+      "name": "Air Temperature",
+      "type": "temperature"
+    },
+    {
+      "id": "154",
+      "name": "Relative Humidity",
+      "type": "other"
+    },
+    {
+      "id": "155",
+      "name": "Air Pressure",
+      "type": "other"
+    },
+    {
+      "id": "156",
+      "name": "Brightness",
+      "type": "other"
+    },
+    {
+      "id": "157",
+      "name": "Brightness Direction",
+      "type": "other"
+    },
+    {
+      "id": "311",
+      "name": "Precipitation Intensity 1",
+      "type": "rainfall"
+    },
+    {
+      "id": "158",
+      "name": "Precipitation Intensity 2",
+      "type": "rainfall"
+    },
+    {
+      "id": "159",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "160",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10070_bbws": [
+    {
+      "id": "240",
+      "name": "Precipitation Intensity",
+      "type": "rainfall"
+    },
+    {
+      "id": "241",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "242",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "243",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10039_psda": [
+    {
+      "id": "283",
+      "name": "Kecepatan Angin",
+      "type": "other"
+    },
+    {
+      "id": "284",
+      "name": "Arah Angin",
+      "type": "other"
+    },
+    {
+      "id": "288",
+      "name": "Kecerahan",
+      "type": "other"
+    },
+    {
+      "id": "289",
+      "name": "Arah Cahaya",
+      "type": "other"
+    },
+    {
+      "id": "290",
+      "name": "Curah Hujan 1",
+      "type": "rainfall"
+    },
+    {
+      "id": "291",
+      "name": "Curah Hujan 2",
+      "type": "rainfall"
+    },
+    {
+      "id": "292",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "293",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10003_psda": [
+    {
+      "id": "33",
+      "name": "Kecepatan Angin",
+      "type": "other"
+    },
+    {
+      "id": "34",
+      "name": "Arah Angin",
+      "type": "other"
+    },
+    {
+      "id": "35",
+      "name": "Temperatur Udara",
+      "type": "temperature"
+    },
+    {
+      "id": "36",
+      "name": "Kelembaban Udara",
+      "type": "other"
+    },
+    {
+      "id": "37",
+      "name": "Tekanan Udara",
+      "type": "other"
+    },
+    {
+      "id": "38",
+      "name": "Kecerahan",
+      "type": "other"
+    },
+    {
+      "id": "39",
+      "name": "Arah Cahaya",
+      "type": "other"
+    },
+    {
+      "id": "40",
+      "name": "Curah Hujan 1",
+      "type": "rainfall"
+    },
+    {
+      "id": "97",
+      "name": "Curah Hujan 2",
+      "type": "rainfall"
+    },
+    {
+      "id": "41",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "42",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10151_bbws": [
+    {
+      "id": "295",
+      "name": "Wind Speed",
+      "type": "other"
+    },
+    {
+      "id": "296",
+      "name": "Wind Direction",
+      "type": "other"
+    },
+    {
+      "id": "297",
+      "name": "Air Temperature",
+      "type": "temperature"
+    },
+    {
+      "id": "298",
+      "name": "Relative Humidity",
+      "type": "other"
+    },
+    {
+      "id": "299",
+      "name": "Air Pressure",
+      "type": "other"
+    },
+    {
+      "id": "310",
+      "name": "Precipitation Intensity",
+      "type": "rainfall"
+    },
+    {
+      "id": "301",
+      "name": "Solar Radiation",
+      "type": "other"
+    },
+    {
+      "id": "302",
+      "name": "UV Index",
+      "type": "other"
+    },
+    {
+      "id": "303",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "304",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "305",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10093_bbws": [
+    {
+      "id": "267",
+      "name": "Precipitation Intensity",
+      "type": "rainfall"
+    },
+    {
+      "id": "268",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "269",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "270",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10248_bbws": [
+    {
+      "id": "321",
+      "name": "Precipitation Intensity",
+      "type": "rainfall"
+    },
+    {
+      "id": "322",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "323",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "324",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10348_bbws": [
+    {
+      "id": "396",
+      "name": "Curah Hujan",
+      "type": "rainfall"
+    },
+    {
+      "id": "393",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "394",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "395",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10028_psda": [
+    {
+      "id": "206",
+      "name": "Kecepatan Angin",
+      "type": "other"
+    },
+    {
+      "id": "207",
+      "name": "Arah Angin",
+      "type": "other"
+    },
+    {
+      "id": "211",
+      "name": "Kecerahan",
+      "type": "other"
+    },
+    {
+      "id": "212",
+      "name": "Arah Cahaya",
+      "type": "other"
+    },
+    {
+      "id": "214",
+      "name": "Curah Hujan 2",
+      "type": "rainfall"
+    },
+    {
+      "id": "215",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "216",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10206_psda": [
+    {
+      "id": "612",
+      "name": "Curah Hujan",
+      "type": "rainfall"
+    },
+    {
+      "id": "613",
+      "name": "Kelembaban Logger",
+      "type": "other"
+    },
+    {
+      "id": "614",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "615",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10031_psda": [
+    {
+      "id": "239",
+      "name": "Kecepatan Angin",
+      "type": "other"
+    },
+    {
+      "id": "240",
+      "name": "Arah Angin",
+      "type": "other"
+    },
+    {
+      "id": "244",
+      "name": "Kecerahan",
+      "type": "other"
+    },
+    {
+      "id": "245",
+      "name": "Arah Cahaya",
+      "type": "other"
+    },
+    {
+      "id": "246",
+      "name": "Curah Hujan 1",
+      "type": "rainfall"
+    },
+    {
+      "id": "247",
+      "name": "Curah Hujan 2",
+      "type": "rainfall"
+    },
+    {
+      "id": "248",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "249",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10347_bbws": [
+    {
+      "id": "392",
+      "name": "Curah Hujan",
+      "type": "rainfall"
+    },
+    {
+      "id": "389",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "390",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "391",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10114_psda": [
+    {
+      "id": "649",
+      "name": "Kedalaman Air Sumur",
+      "type": "other"
+    },
+    {
+      "id": "518",
+      "name": "Curah Hujan",
+      "type": "rainfall"
+    },
+    {
+      "id": "519",
+      "name": "Kelembaban Logger",
+      "type": "other"
+    },
+    {
+      "id": "520",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "521",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10035_psda": [
+    {
+      "id": "173",
+      "name": "Kecepatan Angin",
+      "type": "other"
+    },
+    {
+      "id": "174",
+      "name": "Arah Angin",
+      "type": "other"
+    },
+    {
+      "id": "178",
+      "name": "Kecerahan",
+      "type": "other"
+    },
+    {
+      "id": "179",
+      "name": "Arah Cahaya",
+      "type": "other"
+    },
+    {
+      "id": "180",
+      "name": "Curah Hujan 1",
+      "type": "rainfall"
+    },
+    {
+      "id": "181",
+      "name": "Curah Hujan 2",
+      "type": "rainfall"
+    },
+    {
+      "id": "329",
+      "name": "Kelembaban Logger",
+      "type": "other"
+    },
+    {
+      "id": "182",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "183",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10053_bbws": [
+    {
+      "id": "192",
+      "name": "Precipitation Intensity",
+      "type": "rainfall"
+    },
+    {
+      "id": "193",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "194",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "195",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10048_bbws": [
+    {
+      "id": "172",
+      "name": "Precipitation Intensity",
+      "type": "rainfall"
+    },
+    {
+      "id": "173",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "174",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "175",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10030_psda": [
+    {
+      "id": "228",
+      "name": "Kecepatan Angin",
+      "type": "other"
+    },
+    {
+      "id": "229",
+      "name": "Arah Angin",
+      "type": "other"
+    },
+    {
+      "id": "233",
+      "name": "Kecerahan",
+      "type": "other"
+    },
+    {
+      "id": "234",
+      "name": "Arah Cahaya",
+      "type": "other"
+    },
+    {
+      "id": "235",
+      "name": "Curah Hujan 1",
+      "type": "rainfall"
+    },
+    {
+      "id": "236",
+      "name": "Curah Hujan 2",
+      "type": "rainfall"
+    },
+    {
+      "id": "237",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "238",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10113_psda": [
+    {
+      "id": "514",
+      "name": "Curah Hujan",
+      "type": "rainfall"
+    },
+    {
+      "id": "515",
+      "name": "Kelembaban Logger",
+      "type": "other"
+    },
+    {
+      "id": "516",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "517",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10038_psda": [
+    {
+      "id": "272",
+      "name": "Kecepatan Angin",
+      "type": "other"
+    },
+    {
+      "id": "273",
+      "name": "Arah Angin",
+      "type": "other"
+    },
+    {
+      "id": "277",
+      "name": "Kecerahan",
+      "type": "other"
+    },
+    {
+      "id": "278",
+      "name": "Arah Cahaya",
+      "type": "other"
+    },
+    {
+      "id": "279",
+      "name": "Curah Hujan 1",
+      "type": "rainfall"
+    },
+    {
+      "id": "280",
+      "name": "Curah Hujan 2",
+      "type": "rainfall"
+    },
+    {
+      "id": "281",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "282",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10250_bbws": [
+    {
+      "id": "317",
+      "name": "Precipitation Intensity",
+      "type": "rainfall"
+    },
+    {
+      "id": "318",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "319",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "320",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10033_psda": [
+    {
+      "id": "162",
+      "name": "Kecepatan Angin",
+      "type": "other"
+    },
+    {
+      "id": "163",
+      "name": "Arah Angin",
+      "type": "other"
+    },
+    {
+      "id": "167",
+      "name": "Kecerahan",
+      "type": "other"
+    },
+    {
+      "id": "168",
+      "name": "Arah Cahaya",
+      "type": "other"
+    },
+    {
+      "id": "169",
+      "name": "Curah Hujan 1",
+      "type": "rainfall"
+    },
+    {
+      "id": "170",
+      "name": "Curah Hujan 2",
+      "type": "rainfall"
+    },
+    {
+      "id": "171",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "172",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10049_bbws": [
+    {
+      "id": "176",
+      "name": "Precipitation Intensity",
+      "type": "rainfall"
+    },
+    {
+      "id": "177",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "178",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "179",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10344_bbws": [
+    {
+      "id": "384",
+      "name": "Precipitation Intensity",
+      "type": "rainfall"
+    },
+    {
+      "id": "383",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "382",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "381",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10045_bbws": [
+    {
+      "id": "169",
+      "name": "Precipitation Intensity",
+      "type": "rainfall"
+    },
+    {
+      "id": "170",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "171",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10027_psda": [
+    {
+      "id": "195",
+      "name": "Kecepatan Angin",
+      "type": "other"
+    },
+    {
+      "id": "196",
+      "name": "Arah Angin",
+      "type": "other"
+    },
+    {
+      "id": "200",
+      "name": "Kecerahan",
+      "type": "other"
+    },
+    {
+      "id": "201",
+      "name": "Arah Cahaya",
+      "type": "other"
+    },
+    {
+      "id": "202",
+      "name": "Curah Hujan 1",
+      "type": "rainfall"
+    },
+    {
+      "id": "203",
+      "name": "Curah Hujan 2",
+      "type": "rainfall"
+    },
+    {
+      "id": "204",
+      "name": "Baterai Logger",
+      "type": "battery"
+    },
+    {
+      "id": "205",
+      "name": "Temperatur Logger",
+      "type": "temperature"
+    }
+  ],
+  "10072_bbws": [
+    {
+      "id": "248",
+      "name": "Precipitation Intensity",
+      "type": "rainfall"
+    },
+    {
+      "id": "249",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "250",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "251",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10074_bbws": [
+    {
+      "id": "256",
+      "name": "Wind Speed",
+      "type": "other"
+    },
+    {
+      "id": "257",
+      "name": "Wind Direction",
+      "type": "other"
+    },
+    {
+      "id": "258",
+      "name": "Air Temperature",
+      "type": "temperature"
+    },
+    {
+      "id": "259",
+      "name": "Relative Humidity",
+      "type": "other"
+    },
+    {
+      "id": "260",
+      "name": "Air Pressure",
+      "type": "other"
+    },
+    {
+      "id": "261",
+      "name": "Precipitation Intensity 1",
+      "type": "rainfall"
+    },
+    {
+      "id": "312",
+      "name": "Precipitation Intensity 2",
+      "type": "rainfall"
+    },
+    {
+      "id": "262",
+      "name": "Solar Radiation",
+      "type": "other"
+    },
+    {
+      "id": "266",
+      "name": "UV Index",
+      "type": "other"
+    },
+    {
+      "id": "263",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "264",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "265",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10152_bbws": [
+    {
+      "id": "306",
+      "name": "Precipitation Intensity",
+      "type": "rainfall"
+    },
+    {
+      "id": "307",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "308",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "309",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ],
+  "10073_bbws": [
+    {
+      "id": "252",
+      "name": "Precipitation Intensity",
+      "type": "rainfall"
+    },
+    {
+      "id": "253",
+      "name": "Humidity Logger",
+      "type": "other"
+    },
+    {
+      "id": "254",
+      "name": "Battery Logger",
+      "type": "battery"
+    },
+    {
+      "id": "255",
+      "name": "Temperature Logger",
+      "type": "temperature"
+    }
+  ]
+}

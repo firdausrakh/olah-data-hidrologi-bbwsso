@@ -1,0 +1,14 @@
+{
+  "HGT1465": [
+    {
+      "id": "rain",
+      "name": "Curah Hujan",
+      "type": "rain"
+    },
+    {
+      "id": "tma",
+      "name": "Tinggi Muka Air",
+      "type": "tma"
+    }
+  ]
+}

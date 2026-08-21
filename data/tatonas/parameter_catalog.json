@@ -1,0 +1,228 @@
+{
+  "4102": [
+    {
+      "id": "rainfall",
+      "name": "Curah Hujan",
+      "type": "rain",
+      "unit": "mm",
+      "source_unit": "mm",
+      "sensor_code": "rainfall",
+      "sensor_type": "Rain"
+    },
+    {
+      "id": "battery",
+      "name": "Baterai Logger",
+      "type": "sensor",
+      "unit": "Volt",
+      "source_unit": "Volt",
+      "sensor_code": "battery",
+      "sensor_type": "Device"
+    },
+    {
+      "id": "devicetemp",
+      "name": "Temperatur Logger",
+      "type": "sensor",
+      "unit": "°C",
+      "source_unit": "°C",
+      "sensor_code": "devicetemp",
+      "sensor_type": "Device"
+    }
+  ],
+  "4101": [
+    {
+      "id": "rainfall",
+      "name": "Curah Hujan",
+      "type": "rain",
+      "unit": "mm",
+      "source_unit": "mm",
+      "sensor_code": "rainfall",
+      "sensor_type": "Rain"
+    },
+    {
+      "id": "battery",
+      "name": "Baterai Logger",
+      "type": "sensor",
+      "unit": "Volt",
+      "source_unit": "Volt",
+      "sensor_code": "battery",
+      "sensor_type": "Device"
+    },
+    {
+      "id": "devicetemp",
+      "name": "Temperatur Logger",
+      "type": "sensor",
+      "unit": "°C",
+      "source_unit": "°C",
+      "sensor_code": "devicetemp",
+      "sensor_type": "Device"
+    }
+  ],
+  "4104": [
+    {
+      "id": "curahhujan",
+      "name": "Curah Hujan",
+      "type": "rain",
+      "unit": "mm",
+      "source_unit": "mm",
+      "sensor_code": "curahhujan",
+      "sensor_type": "Rain"
+    },
+    {
+      "id": "battery",
+      "name": "Baterai Logger",
+      "type": "sensor",
+      "unit": "Volt",
+      "source_unit": "Volt",
+      "sensor_code": "battery",
+      "sensor_type": "Device"
+    },
+    {
+      "id": "devicetemp",
+      "name": "Temperatur Logger",
+      "type": "sensor",
+      "unit": "°C",
+      "source_unit": "°C",
+      "sensor_code": "devicetemp",
+      "sensor_type": "Device"
+    }
+  ],
+  "4106": [
+    {
+      "id": "rainfall",
+      "name": "Curah Hujan",
+      "type": "rain",
+      "unit": "mm",
+      "source_unit": "mm",
+      "sensor_code": "rainfall",
+      "sensor_type": "Rain"
+    },
+    {
+      "id": "winddirection",
+      "name": "Arah Angin",
+      "type": "sensor",
+      "unit": "deg",
+      "source_unit": "deg",
+      "sensor_code": "winddirection",
+      "sensor_type": "Climatology"
+    },
+    {
+      "id": "uv",
+      "name": "Indeks UV",
+      "type": "sensor",
+      "unit": "Index",
+      "source_unit": "Index",
+      "sensor_code": "uv",
+      "sensor_type": "Climatology"
+    },
+    {
+      "id": "windvelocity",
+      "name": "Kecepatan Angin",
+      "type": "sensor",
+      "unit": "m/s",
+      "source_unit": "m/s",
+      "sensor_code": "windvelocity",
+      "sensor_type": "Climatology"
+    },
+    {
+      "id": "airhumidity",
+      "name": "Kelembapan Udara",
+      "type": "sensor",
+      "unit": "%",
+      "source_unit": "%",
+      "sensor_code": "airhumidity",
+      "sensor_type": "Climatology"
+    },
+    {
+      "id": "panlevel",
+      "name": "Pan Level",
+      "type": "sensor",
+      "unit": "mm",
+      "source_unit": "mm",
+      "sensor_code": "panlevel",
+      "sensor_type": "Climatology"
+    },
+    {
+      "id": "radiation",
+      "name": "Radiasi Matahari",
+      "type": "sensor",
+      "unit": "w/m2",
+      "source_unit": "w/m2",
+      "sensor_code": "radiation",
+      "sensor_type": "Climatology"
+    },
+    {
+      "id": "airpressure",
+      "name": "Tekanan Udara",
+      "type": "sensor",
+      "unit": "mBar",
+      "source_unit": "mBar",
+      "sensor_code": "airpressure",
+      "sensor_type": "Climatology"
+    },
+    {
+      "id": "airtemperatur",
+      "name": "Temperatur Udara",
+      "type": "sensor",
+      "unit": "°C",
+      "source_unit": "°C",
+      "sensor_code": "airtemperatur",
+      "sensor_type": "Climatology"
+    },
+    {
+      "id": "battery",
+      "name": "Baterai Logger",
+      "type": "sensor",
+      "unit": "Volt",
+      "source_unit": "Volt",
+      "sensor_code": "battery",
+      "sensor_type": "Device"
+    },
+    {
+      "id": "devicetemp",
+      "name": "Temperatur Logger",
+      "type": "sensor",
+      "unit": "°C",
+      "source_unit": "°C",
+      "sensor_code": "devicetemp",
+      "sensor_type": "Device"
+    }
+  ],
+  "4105": [
+    {
+      "id": "waterlevel",
+      "name": "Tinggi Muka Air",
+      "type": "tma",
+      "unit": "m",
+      "source_unit": "cm",
+      "sensor_code": "waterlevel",
+      "sensor_type": "Water"
+    },
+    {
+      "id": "debitair",
+      "name": "Debit",
+      "type": "sensor",
+      "unit": "m3/detik",
+      "source_unit": "m3/detik",
+      "sensor_code": "debitair",
+      "sensor_type": "Factory"
+    },
+    {
+      "id": "battery",
+      "name": "Baterai Logger",
+      "type": "sensor",
+      "unit": "Volt",
+      "source_unit": "Volt",
+      "sensor_code": "battery",
+      "sensor_type": "Device"
+    },
+    {
+      "id": "devicetemp",
+      "name": "Temperatur Logger",
+      "type": "sensor",
+      "unit": "°C",
+      "source_unit": "°C",
+      "sensor_code": "devicetemp",
+      "sensor_type": "Device"
+    }
+  ]
+}

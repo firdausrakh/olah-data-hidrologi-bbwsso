@@ -1,0 +1,146 @@
+{
+  "300": [
+    {
+      "id": "tma",
+      "name": "Tinggi Muka Air",
+      "unit": "m",
+      "source_unit": "m",
+      "type": "tma"
+    }
+  ],
+  "168": [
+    {
+      "id": "tma",
+      "name": "Tinggi Muka Air",
+      "unit": "m",
+      "source_unit": "m",
+      "type": "tma"
+    }
+  ],
+  "299": [
+    {
+      "id": "tma",
+      "name": "Tinggi Muka Air",
+      "unit": "m",
+      "source_unit": "m",
+      "type": "tma"
+    }
+  ],
+  "142": [
+    {
+      "id": "tma1",
+      "name": "Tinggi Muka Air",
+      "unit": "m",
+      "source_unit": "m",
+      "type": "tma"
+    }
+  ],
+  "215": [
+    {
+      "id": "tma1",
+      "name": "Tinggi Muka Air",
+      "unit": "m",
+      "source_unit": "m",
+      "type": "tma"
+    }
+  ],
+  "99": [
+    {
+      "id": "tma1",
+      "name": "Tinggi Muka Air",
+      "unit": "m",
+      "source_unit": "m",
+      "type": "tma"
+    }
+  ],
+  "171": [
+    {
+      "id": "tma",
+      "name": "Tinggi Muka Air",
+      "unit": "m",
+      "source_unit": "m",
+      "type": "tma"
+    }
+  ],
+  "64": [
+    {
+      "id": "tma1",
+      "name": "Tinggi Muka Air",
+      "unit": "m",
+      "source_unit": "m",
+      "type": "tma"
+    }
+  ],
+  "83": [
+    {
+      "id": "tma1",
+      "name": "Tinggi Muka Air",
+      "unit": "mdpl",
+      "source_unit": "mdpl",
+      "type": "tma"
+    }
+  ],
+  "60": [
+    {
+      "id": "tma",
+      "name": "Tinggi Muka Air",
+      "unit": "m",
+      "source_unit": "m",
+      "type": "tma"
+    }
+  ],
+  "58": [
+    {
+      "id": "tma",
+      "name": "Tinggi Muka Air",
+      "unit": "m",
+      "source_unit": "m",
+      "type": "tma"
+    }
+  ],
+  "92": [
+    {
+      "id": "tma1",
+      "name": "Tinggi Muka Air",
+      "unit": "m",
+      "source_unit": "m",
+      "type": "tma"
+    }
+  ],
+  "214": [
+    {
+      "id": "tma1",
+      "name": "Tinggi Muka Air",
+      "unit": "m",
+      "source_unit": "m",
+      "type": "tma"
+    }
+  ],
+  "91": [
+    {
+      "id": "tmaikn",
+      "name": "Tinggi Muka Air",
+      "unit": "m",
+      "source_unit": "m",
+      "type": "tma"
+    }
+  ],
+  "93": [
+    {
+      "id": "tmaikr",
+      "name": "Tinggi Muka Air",
+      "unit": "m",
+      "source_unit": "m",
+      "type": "tma"
+    }
+  ],
+  "172": [
+    {
+      "id": "tma2",
+      "name": "Tinggi Muka Air",
+      "unit": "m",
+      "source_unit": "m",
+      "type": "tma"
+    }
+  ]
+}

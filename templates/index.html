@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+{% from "components/ui.html" import card, card_header, field, stat_card, info_item, three_column_layout %}
+{% block title %}Pengolahan{% endblock %}
+{% block body_class %}ui-dashboard-page processing-page{% endblock %}
+{% block page_title %}Pengolah Data Jam-Jaman{% endblock %}
+{% block page_subtitle %}Ambil data logger, olah menjadi format jam-jaman, periksa grafik, lalu ekspor ke Excel{% endblock %}
+{% block nav_olah_class %}active{% endblock %}
+{% block head_extra %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/processing.css') }}">
+{% endblock %}
+{% block content %}
+{% call(slot) three_column_layout(classes="processing-dashboard", left_aria="Pengaturan data", center_aria="Hasil pengolahan", right_aria="Ringkasan pengolahan", left_classes="processing-left", center_classes="processing-center", right_classes="processing-right") %}
+    {% if slot == "left" %}
+
+        {% call card(classes='processing-filter-card') %}
+            {{ card_header('Pilih Data', 'Atur sumber dan periode telemetri', 'sliders-horizontal', 'box', 'h2') }}
+
+            <div class="processing-form-stack">
+                {% call field('Logger', 'brandSelect', 'Pilih vendor logger. Higertech diprioritaskan saat pemuatan awal agar Pos Duga Air Kranggan dapat ditampilkan lebih cepat.', 'compact-field') %}
+                    <select id="brandSelect" onchange="onBrandChange()">
+                        <option value="all" selected>Semua</option>
+                        <option value="beacon">Beacon</option>
+                        <option value="tatonas">Tatonas</option>
+                        <option value="higertech">Higertech</option>
+                        <option value="dashindo">Dashindo</option>
+                    </select>
+                {% endcall %}
+
+                {% call field('Kategori Data', 'dataTypeSelect', 'Pilih jenis data hidrologi. Curah hujan mengikuti hari hidrologis, sedangkan tinggi muka air mengikuti waktu pencatatan.', 'compact-field') %}
+                    <select id="dataTypeSelect" onchange="onDataTypeChange()">
+                        <option value="rain">Curah Hujan</option>
+                        <option value="tma" selected>Tinggi Muka Air</option>
+                    </select>
+                {% endcall %}
+
+                {% call field('Sumber Data', 'sourceModeSelect', 'Server Telemetri mengambil data langsung dari vendor. Upload Manual digunakan untuk file Excel atau CSV lokal.', 'compact-field source-control', '', 'sourceSelectGroup') %}
+                    <select aria-label="Sumber Data" id="sourceModeSelect">
+                        <option value="server">Server Telemetri</option>
+                        <option value="upload">Upload Manual</option>
+                    </select>
+                    <div class="source-connection-indicator" id="sourceConnectionIndicator" aria-live="polite">
+                        <span class="live-dot" aria-hidden="true"></span>
+                        <strong id="sourceLiveIndicator">LIVE</strong>
+                        <span id="sourceConnectionText">(Terhubung)</span>
+                    </div>
+                    <input id="beaconSourceMode" type="hidden" value="server"/>
+                {% endcall %}
+
+                <div class="upload-area reference-upload" id="dropArea" onclick="document.getElementById('fileInput').click()">
+                    <button class="remove-file-btn" id="removeFileBtn" onclick="clearFile(event)" title="Hapus File" type="button"><i data-lucide="x"></i></button>
+                    <div class="upload-icon"><i class="cloud-icon" data-lucide="upload-cloud"></i></div>
+                    <p id="fileNameDisplay">Klik atau seret file Excel/CSV ke sini</p>
+                    <span>Mendukung .xlsx, .xls, dan .csv</span>
+                    <input accept=".xlsx, .xls, .csv" id="fileInput" onchange="handleFileSelect(event)" type="file"/>
+                </div>
+
+                <div class="beacon-remote" id="beaconRemoteArea">
+                    <div id="beaconServerArea">
+                        <div class="beacon-remote-grid reference-remote-grid">
+                            {% call field('<span id="beaconPosLabelText">Pos Duga Air</span>', 'beaconPosSelect', 'Pilih pos yang akan diolah. Daftar pos disaring sesuai logger dan kategori data.', 'compact-field', 'beaconPosLabel') %}
+                                <select id="beaconPosSelect"><option value="">Memuat daftar pos...</option></select>
+                            {% endcall %}
+
+                            {% call field('Parameter', 'beaconParamSelect', 'Pilih sensor atau parameter utama dari pos. Sistem memprioritaskan parameter hidrologi yang paling relevan.', 'compact-field') %}
+                                <select disabled id="beaconParamSelect"><option value="">Pilih pos terlebih dahulu</option></select>
+                            {% endcall %}
+
+                            {% call field('Rentang Tanggal', 'beaconPeriodMode', 'Pilih pola periode harian, bulanan, tahunan, atau rentang tanggal khusus.', 'compact-field') %}
+                                <select id="beaconPeriodMode">
+                                    <option value="day">Harian</option>
+                                    <option selected value="month">Bulanan</option>
+                                    <option value="year">Tahunan</option>
+                                    <option value="custom">Rentang Tanggal</option>
+                                </select>
+                            {% endcall %}
+
+                            <div id="beaconDailyWrap" style="display:none;">
+                                {% call field('Tanggal', 'beaconDailyDate', 'Tanggal pengolahan satu hari. Tanggal masa depan tidak dapat dipilih.', 'compact-field') %}
+                                    <div class="period-picker-wrap"><input aria-label="Pilih tanggal" autocomplete="off" class="period-picker-input" id="beaconDailyDate" inputmode="none" readonly type="text"/><i class="period-picker-icon" data-lucide="calendar-days"></i></div>
+                                {% endcall %}
+                            </div>
+
+                            <div id="beaconMonthWrap">
+                                {% call field('Bulan', 'beaconMonthYearPicker', 'Pilih bulan pengolahan. Jika bulan berjalan dipilih, data berhenti pada waktu saat ini.', 'compact-field') %}
+                                    <div class="period-picker-wrap"><input aria-label="Pilih bulan dan tahun" autocomplete="off" class="period-picker-input" id="beaconMonthYearPicker" inputmode="none" readonly type="text"/><i class="period-picker-icon" data-lucide="calendar-month"></i></div>
+                                    <input id="beaconMonth" type="hidden"/><input id="beaconMonthYear" type="hidden"/>
+                                {% endcall %}
+                            </div>
+
+                            <div id="beaconYearWrap" style="display:none;">
+                                {% call field('Tahun', 'beaconYearPicker', 'Pilih tahun pengolahan. Tahun berjalan otomatis dibatasi pada tanggal saat ini.', 'compact-field') %}
+                                    <div class="period-picker-wrap"><input aria-label="Pilih tahun" autocomplete="off" class="period-picker-input" id="beaconYearPicker" inputmode="none" readonly type="text"/><i class="period-picker-icon" data-lucide="calendar-range"></i></div>
+                                    <input id="beaconYear" type="hidden"/>
+                                {% endcall %}
+                            </div>
+
+                            <div class="custom-date-pair" id="customDatePair">
+                                <div id="beaconCustomFromWrap" style="display:none;">
+                                    {% call field('Dari Tanggal', 'beaconCustomFrom', 'Tanggal awal rentang data yang akan diambil.', 'compact-field') %}
+                                        <div class="period-picker-wrap"><input aria-label="Pilih tanggal mulai" autocomplete="off" class="period-picker-input" id="beaconCustomFrom" inputmode="none" readonly type="text"/><i class="period-picker-icon" data-lucide="calendar-days"></i></div>
+                                    {% endcall %}
+                                </div>
+                                <div id="beaconCustomToWrap" style="display:none;">
+                                    {% call field('Sampai Tanggal', 'beaconCustomTo', 'Tanggal akhir rentang data. Sistem tidak mengambil data melebihi waktu saat ini.', 'compact-field') %}
+                                        <div class="period-picker-wrap"><input aria-label="Pilih tanggal akhir" autocomplete="off" class="period-picker-input" id="beaconCustomTo" inputmode="none" readonly type="text"/><i class="period-picker-icon" data-lucide="calendar-days"></i></div>
+                                    {% endcall %}
+                                </div>
+                            </div>
+
+                            <div id="serverCorrectionGroup">
+                                {% call field('Faktor Koreksi (Pengali)', 'correctionInput', 'Koreksi bersifat opsional. Curah hujan menggunakan pengali, sedangkan tinggi muka air menggunakan penambahan dalam meter.', 'compact-field correction-field', 'serverCorrectionLabel') %}
+                                    <div class="correction-inline reference-correction">
+                                        <label class="correction-inline-check" for="correctionEnabled"><input id="correctionEnabled" type="checkbox"/><span>Gunakan</span></label>
+                                        <input disabled id="correctionInput" placeholder="1 = tanpa koreksi" step="0.01" type="number" value="1"/>
+                                    </div>
+                                {% endcall %}
+                            </div>
+                        </div>
+                        <div class="status" id="beaconStatus"></div>
+                    </div>
+                </div>
+
+                <div class="mapping-container manual-mapping reference-mapping" id="mappingSection">
+                    {% call field('Kolom Waktu', 'timeColumnSelect', 'Pilih kolom yang memuat tanggal dan waktu pencatatan dari file manual.', 'compact-field') %}<select id="timeColumnSelect"></select>{% endcall %}
+                    {% call field('Kolom Nilai', 'valueColumnSelect', 'Pilih kolom nilai sensor yang akan diolah menjadi data jam-jaman.', 'compact-field', 'valueLabel') %}<select id="valueColumnSelect"></select>{% endcall %}
+                    <div id="correctionGroup">
+                        {% call field('Faktor Koreksi (Pengali)', 'manualCorrectionInput', 'Terapkan koreksi hanya bila hasil verifikasi atau kalibrasi lapangan mensyaratkannya.', 'compact-field correction-field', 'correctionLabel') %}
+                            <div class="correction-inline reference-correction">
+                                <label class="correction-inline-check" for="manualCorrectionEnabled"><input id="manualCorrectionEnabled" type="checkbox"/><span>Gunakan</span></label>
+                                <input disabled id="manualCorrectionInput" placeholder="1 = tanpa koreksi" step="0.01" type="number" value="1"/>
+                            </div>
+                        {% endcall %}
+                    </div>
+                </div>
+
+                <div class="processing-action-row reference-process-row">
+                    <div class="btn-group"><button class="btn btn-secondary reference-process-btn" disabled id="processBtn" onclick="executeProcessing()"><i data-lucide="play"></i> Proses Data</button></div>
+                </div>
+                <div aria-live="polite" class="process-progress" id="processProgress" role="status">
+                    <div class="process-progress-head"><span id="processProgressLabel">Menyiapkan pemrosesan...</span><span id="processProgressHint">Mohon tunggu</span></div>
+                    <div class="process-progress-track"><div class="process-progress-bar" id="processProgressBar"></div></div>
+                </div>
+                <div class="status" id="statusMessage"></div>
+            </div>
+        {% endcall %}
+
+        {% call card(classes='reference-info-card ui-card--compact') %}
+            <div class="reference-info-heading"><i data-lucide="info"></i><strong>Informasi</strong></div>
+            <div class="ui-info-list">
+                {{ info_item('clock-3', 'Curah hujan memakai hari hidrologis <strong>07:00–06:59 WIB</strong>.') }}
+                {{ info_item('split', 'Rentang panjang dibagi otomatis sesuai batas request tiap logger.') }}
+                {{ info_item('calendar-check-2', 'Periode pengolahan tidak melewati waktu saat ini.') }}
+            </div>
+        {% endcall %}
+    {% elif slot == "center" %}
+
+        {% call card(classes='result-empty', id='processingResultEmpty') %}
+            <div class="empty-visual"><i data-lucide="chart-column-big"></i></div>
+            <h2>Hasil pengolahan akan tampil di sini</h2>
+            <p>Pilih logger, pos, parameter, dan periode di panel kiri, kemudian tekan <strong>Proses Data</strong>.</p>
+        {% endcall %}
+
+        {% call card(classes='chart-card reference-chart-card', id='chartCard') %}
+            {% call card_header('Grafik Jam-Jaman', 'Profil data berdasarkan log data', 'chart-no-axes-combined', 'inline', 'h3', 'reference-card-header', 'chartTitle', 'chartSub') %}
+                <span class="period-chip" id="chartPeriodBadge"><i data-lucide="calendar-days"></i><span>Seluruh periode</span></span>
+                <div class="chart-tools">
+                    <button class="btn chart-download-btn" id="chartMenuBtn" type="button" aria-haspopup="true" aria-expanded="false" title="Unduh grafik"><i data-lucide="download"></i><span>Unduh Grafik</span></button>
+                    <div class="chart-export-menu" id="chartExportMenu" hidden>
+                        <button type="button" data-chart-action="print">Cetak Grafik</button>
+                        <button type="button" data-chart-action="png">Unduh PNG</button>
+                        <button type="button" data-chart-action="jpeg">Unduh JPG</button>
+                        <button type="button" data-chart-action="xls">Unduh Excel</button>
+                    </div>
+                </div>
+            {% endcall %}
+            <div class="chart-panel"><div class="chart-canvas-wrap"><canvas id="tmaChart" class="telemetry-chart" aria-label="Grafik data telemetri" role="img"></canvas></div></div>
+        {% endcall %}
+
+        {% call card(classes='reference-table-card', id='tableCard') %}
+            {% call card_header('Data Hasil Pengolahan', 'Format jam-jaman, tanggal yyyy-mm-dd', 'table-2', 'inline', 'h3', 'table-reference-header', '', 'tableResultMeta') %}
+                <div class="table-download-action" id="downloadCard">
+                    <button class="btn table-download-btn" disabled id="downloadBtn" onclick="exportToExcel()"><i data-lucide="file-down"></i> Unduh Excel</button>
+                </div>
+            {% endcall %}
+            <div class="table-container"><table id="previewTable"><thead><tr id="tableHeader"></tr></thead><tbody id="tableBody"></tbody></table></div>
+            <div class="table-footer-note"><span><i data-lucide="move-horizontal"></i> Geser horizontal untuk melihat seluruh jam.</span><span id="tableRowCount">-</span></div>
+        {% endcall %}
+    {% elif slot == "right" %}
+
+        {% call card(classes='reference-summary-card') %}
+            {{ card_header('Ringkasan', 'Informasi data yang dipilih', 'clipboard-list', 'box', 'h2', 'summary-heading') }}
+
+            <div class="ui-subsection summary-section-block">
+                <h3 class="ui-subsection__title">Informasi Pos</h3>
+                <dl class="station-summary-list">
+                    <div><dt>Logger</dt><dd id="summaryLogger">-</dd></div>
+                    <div><dt>Pos</dt><dd id="summaryStation">-</dd></div>
+                    <div><dt>Parameter</dt><dd id="summaryParameter">-</dd></div>
+                    <div><dt>Tipe Data</dt><dd id="summaryDataType">Jam-Jaman</dd></div>
+                </dl>
+            </div>
+
+            <div class="ui-subsection summary-section-block range-summary-block">
+                <h3 class="ui-subsection__title"><i data-lucide="calendar-range"></i>Rentang Data</h3>
+                <div class="range-summary-value" id="summaryRange">Belum diproses</div>
+            </div>
+
+            <div class="ui-subsection summary-section-block stats-summary-block">
+                <h3 class="ui-subsection__title" id="summaryStatisticTitle">Ringkasan Tinggi Muka Air</h3>
+                <div class="ui-stat-stack reference-summary-grid" id="summaryGrid">
+                    {{ stat_card('Data Terakhir', 'cardLastVal', 'unitLast', 'cardLastDate', 'gauge', 'neutral', 'cardLastIcon', 'cardLastTitle', 'clock-3', 'reference-stat-card stat-latest') }}
+                    {{ stat_card('Tertinggi', 'cardMaxVal', 'unitMax', 'subtextMax', 'trending-up', 'high', 'cardMaxIcon', 'cardMaxTitle', 'arrow-up-right', 'reference-stat-card stat-high') }}
+                    {{ stat_card('Terendah', 'cardMinVal', 'unitMin', 'subtextMin', 'trending-down', 'low', 'cardMinIcon', 'cardMinTitle', 'arrow-down-right', 'reference-stat-card stat-low') }}
+                    {{ stat_card('Rerata', 'cardAggVal', 'unitAgg', 'subtextAgg', 'sigma', 'aggregate', 'cardAggIcon', 'cardAggTitle', 'calendar-range', 'reference-stat-card stat-aggregate') }}
+                </div>
+            </div>
+        {% endcall %}
+
+        {% call card(classes='reference-help-card ui-card--compact ui-card--soft') %}
+            <div class="reference-info-heading"><i data-lucide="circle-help"></i><strong>Keterangan</strong></div>
+            <p id="hydrologyInfoText">Tinggi muka air ditampilkan sesuai waktu pencatatan 00:00–23:59 WIB.</p>
+        {% endcall %}
+    {% endif %}
+{% endcall %}
+
+<div aria-hidden="true" class="auth-modal-backdrop" id="telemetryAuthModal">
+    <div aria-labelledby="telemetryAuthTitle" aria-modal="true" class="auth-modal" role="dialog">
+        <div class="modal-icon"><i data-lucide="lock-keyhole"></i></div>
+        <h3 id="telemetryAuthTitle">Akses Server Telemetri</h3>
+        <p>Masukkan kata sandi untuk mengakses data telemetri langsung dari server.</p>
+        <input class="input" id="telemetryAppPassword" placeholder="Kata sandi" type="password"/>
+        <div class="auth-error" id="telemetryAuthError"></div>
+        <div class="auth-actions">
+            <button class="btn btn-neutral" onclick="closeTelemetryAuth(false)" type="button">Batal</button>
+            <button class="btn btn-primary-solid" onclick="submitTelemetryAuth()" type="button"><i data-lucide="log-in"></i> Masuk</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>window.SERVER_CHUNK_CONFIG = {{ chunk_config|tojson }};</script>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+{% endblock %}

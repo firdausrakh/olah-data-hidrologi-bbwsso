@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% from "components/ui.html" import card, card_header, field, status_card, info_item, summary_table, three_column_layout %}
+{% block title %}Monitoring{% endblock %}
+{% block body_class %}ui-dashboard-page monitoring-page{% endblock %}
+{% block page_title %}Monitoring Telemetri{% endblock %}
+{% block page_subtitle %}Mengintegrasikan data hidrologi telemetri dari berbagai vendor{% endblock %}
+{% block nav_monitor_class %}active{% endblock %}
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring.css') }}">
+{% endblock %}
+{% block content %}
+{% call(slot) three_column_layout(classes="monitoring-dashboard", left_aria="Filter monitoring", center_aria="Data monitoring terpadu", right_aria="Ringkasan monitoring", left_classes="monitoring-left", center_classes="monitoring-center", right_classes="monitoring-right") %}
+    {% if slot == "left" %}
+
+        {% call card(classes='monitor-filter-card') %}
+            {{ card_header('Filter Monitoring', 'Atur jenis data dan periode pemantauan', 'list-filter', 'box', 'h2') }}
+
+            <div class="monitor-form-stack">
+                {% call field('Kategori Data', 'category', 'Pilih Curah Hujan atau Tinggi Muka Air. Pilihan awal dikosongkan agar data hanya dimuat saat Anda meminta.', 'monitor-field') %}
+                    <select id="category"><option value="" selected>Pilih Kategori</option><option value="rain">Curah Hujan</option><option value="tma">Tinggi Muka Air</option></select>
+                {% endcall %}
+                {% call field('Tipe Data', 'resolution', 'Jam-Jaman menampilkan interval setiap jam. Harian menampilkan agregasi harian sesuai kaidah hidrologi.', 'monitor-field') %}
+                    <select id="resolution"><option value="hourly">Jam-Jaman</option><option value="daily">Harian</option></select>
+                {% endcall %}
+                {% call field('Rentang Tanggal', 'periodMode', 'Pilih bentuk periode pemantauan. Rentang Tanggal menjadi pilihan awal dan memuat tiga hari terakhir: H-2, H-1, dan hari ini.', 'monitor-field') %}
+                    <select id="periodMode"><option value="day">Harian</option><option value="month">Bulanan</option><option value="year">Tahunan</option><option value="custom" selected>Rentang Tanggal</option></select>
+                {% endcall %}
+
+                <div class="period-detail one" hidden id="dayFields">
+                    {% call field('Tanggal', 'dailyDate', 'Tanggal pantau satu hari. Untuk curah hujan, satu hari mengikuti 07:00–06:59 WIB hari berikutnya.', 'monitor-field') %}
+                        <div class="monitor-date-wrap"><input autocomplete="off" id="dailyDate" readonly inputmode="none"/><i data-lucide="calendar-days"></i></div>
+                    {% endcall %}
+                </div>
+                <div class="period-detail one" hidden id="monthFields">
+                    {% call field('Bulan', 'monthDate', 'Pilih satu bulan. Bulan berjalan otomatis dibatasi pada waktu saat ini.', 'monitor-field') %}
+                        <div class="monitor-date-wrap"><input autocomplete="off" id="monthDate" readonly inputmode="none"/><i data-lucide="calendar-month"></i></div>
+                    {% endcall %}
+                </div>
+                <div class="period-detail one" hidden id="yearFields">
+                    {% call field('Tahun', 'yearDate', 'Pilih satu tahun. Tahun berjalan otomatis dibatasi pada tanggal saat ini.', 'monitor-field') %}
+                        <div class="monitor-date-wrap"><input autocomplete="off" id="yearDate" readonly inputmode="none"/><i data-lucide="calendar-range"></i></div>
+                    {% endcall %}
+                </div>
+                <div class="period-detail" id="customFields">
+                    {% call field('Dari Tanggal', 'dateFrom', 'Tanggal awal rentang monitoring.', 'monitor-field') %}
+                        <div class="monitor-date-wrap"><input autocomplete="off" id="dateFrom" readonly inputmode="none"/><i data-lucide="calendar-days"></i></div>
+                    {% endcall %}
+                    {% call field('Sampai Tanggal', 'dateTo', 'Tanggal akhir rentang monitoring. Tanggal masa depan otomatis dipotong.', 'monitor-field') %}
+                        <div class="monitor-date-wrap"><input autocomplete="off" id="dateTo" readonly inputmode="none"/><i data-lucide="calendar-days"></i></div>
+                    {% endcall %}
+                </div>
+
+                <div class="monitor-actions">
+                    <button class="btn monitor-primary-btn" id="showBtn" disabled><i data-lucide="search"></i>Tampilkan Data</button>
+                    <button class="btn monitor-download-btn" disabled id="downloadBtn"><i data-lucide="file-down"></i>Unduh Excel</button>
+                </div>
+                <div class="loading-box" id="loading">
+                    <div class="loading-head"><span>Mengambil data seluruh logger...</span><span>Mohon tunggu</span></div>
+                    <div class="loading-track"><div class="loading-bar"></div></div>
+                </div>
+            </div>
+        {% endcall %}
+
+        {% call card(classes='monitor-info-card ui-card--compact') %}
+            <div class="monitor-info-heading"><i data-lucide="info"></i><strong>Informasi</strong></div>
+            <div class="ui-info-list">
+                {{ info_item('radio-tower', 'Monitoring menggabungkan data seluruh logger yang tersedia.') }}
+                {{ info_item('shield-check', 'Gangguan pada satu pos tidak menghentikan data pos lainnya.') }}
+                {{ info_item('calendar-check-2', 'Rentang data otomatis berhenti pada waktu saat ini.') }}
+            </div>
+        {% endcall %}
+    {% elif slot == "center" %}
+
+        {% call card(classes='monitor-table-card') %}
+            {% call card_header('Data Monitoring Terpadu', 'Pilih kategori dan periode, lalu tampilkan data', 'table-2', 'inline', 'h3', 'monitor-card-header', '', 'titleLine') %}
+                <div class="monitor-orientation" aria-label="Orientasi tabel">
+                    <button class="active" id="horizontalBtn" type="button"><i data-lucide="columns-3"></i><span>Horizontal</span></button>
+                    <button id="verticalBtn" type="button"><i data-lucide="rows-3"></i><span>Vertikal</span></button>
+                </div>
+            {% endcall %}
+            <div class="monitor-status-row">
+                <div class="status" id="statusLine">Belum ada data yang dimuat.</div>
+                <span class="monitor-table-hint"><i data-lucide="move-horizontal"></i> Geser tabel untuk melihat seluruh periode.</span>
+            </div>
+
+            <div class="monitor-table-wrap">
+                <table id="monitorTable">
+                    <tbody><tr><td class="empty monitor-empty-cell"><span class="monitor-empty-icon"><i data-lucide="database-zap"></i></span><strong>Belum ada data</strong><small>Atur filter di panel kiri lalu tekan Tampilkan Data.</small></td></tr></tbody>
+                </table>
+            </div>
+        {% endcall %}
+
+        {% call card(classes='rain-classification-card ui-card--compact', id='rainClassificationLegend', hidden=true) %}
+            <div class="rain-classification-heading">
+                <span class="rain-classification-heading__icon"><i data-lucide="cloud-rain-wind"></i></span>
+                <div><strong>Klasifikasi Curah Hujan</strong><small>Warna diterapkan pada nilai hujan yang masuk klasifikasi.</small></div>
+            </div>
+            <div class="rain-classification-grid">
+                <section class="rain-classification-group" aria-label="Klasifikasi intensitas hujan">
+                    <h3>Intensitas Hujan (mm/jam)</h3>
+                    <div class="rain-classification-items">
+                        <span><i style="--rain-class:#00DE20"></i>Hujan Ringan <b>1–5</b></span>
+                        <span><i style="--rain-class:#FDF900"></i>Hujan Sedang <b>5–10</b></span>
+                        <span><i style="--rain-class:#FD9500"></i>Hujan Lebat <b>10–20</b></span>
+                        <span><i style="--rain-class:#FF0400"></i>Hujan Sangat Lebat <b>20–50</b></span>
+                        <span><i style="--rain-class:#EA11F4"></i>Hujan Ekstrem <b>&gt;50</b></span>
+                    </div>
+                </section>
+                <section class="rain-classification-group" aria-label="Klasifikasi hujan harian">
+                    <h3>Hujan Harian (mm)</h3>
+                    <div class="rain-classification-items">
+                        <span><i style="--rain-class:#00DE20"></i>Hujan Ringan <b>0.5–20</b></span>
+                        <span><i style="--rain-class:#FDF900"></i>Hujan Sedang <b>20–50</b></span>
+                        <span><i style="--rain-class:#FD9500"></i>Hujan Lebat <b>50–100</b></span>
+                        <span><i style="--rain-class:#FF0400"></i>Hujan Sangat Lebat <b>100–150</b></span>
+                        <span><i style="--rain-class:#EA11F4"></i>Hujan Ekstrem <b>&gt;150</b></span>
+                    </div>
+                </section>
+            </div>
+        {% endcall %}
+    {% elif slot == "right" %}
+
+        {% call card(classes='monitor-summary-card') %}
+            {{ card_header('Ringkasan', 'Status data monitoring terpadu', 'clipboard-list', 'box', 'h2', 'monitor-summary-heading') }}
+
+            <div class="ui-subsection monitor-summary-section">
+                <h3 class="ui-subsection__title">Konfigurasi</h3>
+                <dl class="monitor-summary-list">
+                    <div><dt>Kategori</dt><dd id="summaryMonitorCategory">Pilih Kategori</dd></div>
+                    <div><dt>Tipe Data</dt><dd id="summaryMonitorResolution">Jam-Jaman</dd></div>
+                    <div><dt>Periode</dt><dd id="summaryMonitorPeriodMode">Rentang Tanggal</dd></div>
+                    <div><dt>Logger</dt><dd>Semua</dd></div>
+                </dl>
+            </div>
+
+            <div class="ui-subsection monitor-summary-section">
+                <h3 class="ui-subsection__title"><i data-lucide="calendar-range"></i>Rentang Data</h3>
+                <div class="monitor-range-value" id="periodMetric">Belum dipilih</div>
+            </div>
+
+            <div class="ui-subsection monitor-summary-section monitor-extreme-summary" id="monitorPeakSummary" hidden>
+                <h3 class="ui-subsection__title"><i data-lucide="gauge"></i>Ringkasan Tertinggi</h3>
+                {{ summary_table('Intensitas Hujan Tertinggi', 'cloud-rain', 'hourlyPeakTable', 'hourlyPeakBody', 'downloadHourlyPeakBtn', ['Nama Pos', 'Intensitas (mm/jam)', 'Waktu'], 'monitor-peak-table', 'hourlyPeakTitle') }}
+                {{ summary_table('Hujan Harian Tertinggi', 'calendar-arrow-up', 'dailyPeakTable', 'dailyPeakBody', 'downloadDailyPeakBtn', ['Nama Pos', 'Hujan Harian (mm)', 'Tanggal'], 'monitor-peak-table', 'dailyPeakTitle') }}
+            </div>
+
+            <div class="ui-subsection monitor-summary-section monitor-status-summary">
+                <h3 class="ui-subsection__title"><i data-lucide="activity"></i>Status Pengambilan</h3>
+                <div class="ui-status-stack monitor-status-cards">
+                    {{ status_card('Berhasil', 'stationCountMetric', 'circle-check-big', 'success', 'gap kosong kontinyu ≤6 jam/hari', 'monitor-status-card success-stat') }}
+                    {{ status_card('Gagal', 'warningCountMetric', 'circle-x', 'neutral', 'request gagal', 'monitor-status-card failure-stat') }}
+                    {{ status_card('Peringatan', 'staleWarningMetric', 'clock-alert', 'warning', 'gap kosong kontinyu >6 s.d. 12 jam/hari', 'monitor-status-card stale-stat') }}
+                    {{ status_card('Terputus', 'disconnectedMetric', 'wifi-off', 'danger', 'gap kosong kontinyu >12 jam/hari', 'monitor-status-card disconnected-stat') }}
+                </div>
+            </div>
+        {% endcall %}
+
+        {% call card(classes='monitor-help-card ui-card--compact ui-card--soft') %}
+            <div class="monitor-info-heading"><i data-lucide="circle-help"></i><strong>Keterangan</strong></div>
+            <p id="monitorHydrologyInfo">Curah hujan jam-jaman mengikuti periode hidrologis dan data sumber masing-masing logger.</p>
+        {% endcall %}
+    {% endif %}
+{% endcall %}
+
+
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/monitoring.js') }}"></script>{% endblock %}

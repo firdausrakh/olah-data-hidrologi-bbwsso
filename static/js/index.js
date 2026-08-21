@@ -1536,10 +1536,21 @@ let tmaChartInstance = null;
         updateSummaryLabels(typeSelect?.value||'tma');
         updateCorrectionUI();
 
+        // Terapkan mode sumber sebelum request /api/auth/status agar halaman tidak
+        // sempat merender area Upload Manual ketika sesi Flask sudah terautentikasi.
+        // Jika belum login, tampilkan mode manual segera tanpa menunggu request.
+        const sourceSelect=document.getElementById('sourceModeSelect');
+        const hidden=document.getElementById('beaconSourceMode');
+        const bootstrapAuthenticated=!!window.HydroUI?.authState?.authenticated;
+        const initialSource=bootstrapAuthenticated
+            ? (saved?.sourceMode==='upload'?'upload':'server')
+            : 'upload';
+        if(sourceSelect) sourceSelect.value=initialSource;
+        if(hidden) hidden.value=initialSource;
+        updateSourceVisibility();
+
         const authenticated=await checkTelemetryAuth();
         if(authenticated){
-            const sourceSelect=document.getElementById('sourceModeSelect');
-            const hidden=document.getElementById('beaconSourceMode');
             const wantedSource=saved?.sourceMode==='upload'?'upload':'server';
             if(sourceSelect) sourceSelect.value=wantedSource;
             if(hidden) hidden.value=wantedSource;

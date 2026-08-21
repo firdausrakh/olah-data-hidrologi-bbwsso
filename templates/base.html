@@ -22,6 +22,16 @@
         } | tojson }};
     </script>
     <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/vendor/speed-insights.js') }}"></script>
+    <script>
+        // Initialize Vercel Speed Insights
+        if (typeof window !== 'undefined' && window.injectSpeedInsights) {
+            window.injectSpeedInsights({
+                debug: false,
+                sampleRate: 1
+            });
+        }
+    </script>
     {% block head_extra %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">

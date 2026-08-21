@@ -31,6 +31,7 @@ Pipeline UI/UX dan pemrosesan dibuat tetap seragam meskipun masing-masing vendor
 - [Menjalankan Secara Lokal](#menjalankan-secara-lokal)
 - [Environment Variables](#environment-variables)
 - [Deploy GitHub + Vercel](#deploy-github--vercel)
+- [Vercel Speed Insights](#vercel-speed-insights)
 - [Struktur Repository](#struktur-repository)
 - [Keamanan](#keamanan)
 - [Catatan Operasional](#catatan-operasional)
@@ -593,13 +594,22 @@ Jika koreksi tidak diaktifkan, nilai asli tidak diubah.
 
 - Python 3.11+ disarankan
 - pip
+- Node.js 18+ (untuk Vercel Speed Insights)
 - koneksi internet untuk sumber Server Telemetri
 
-Install dependency:
+Install dependency Python:
 
 ```bash
 python -m pip install -r requirements.txt
 ```
+
+Install dependency JavaScript (untuk Vercel Speed Insights):
+
+```bash
+npm install
+```
+
+Perintah `npm install` akan secara otomatis menyalin file Speed Insights ke direktori `static/js/vendor/`.
 
 Jalankan aplikasi dari root repository:
 
@@ -880,6 +890,58 @@ Disarankan menguji vendor dengan periode pendek terlebih dahulu sebelum melakuka
 
 ---
 
+# Vercel Speed Insights
+
+Aplikasi ini telah dikonfigurasi dengan **Vercel Speed Insights** untuk memantau performa halaman web secara real-time.
+
+## Cara Kerja
+
+Speed Insights secara otomatis melacak metrik performa web seperti:
+- **First Contentful Paint (FCP)**
+- **Largest Contentful Paint (LCP)**
+- **Cumulative Layout Shift (CLS)**
+- **First Input Delay (FID)**
+- **Time to First Byte (TTFB)**
+
+## Konfigurasi
+
+Speed Insights diinisialisasi di `templates/base.html` dengan konfigurasi:
+
+```javascript
+window.injectSpeedInsights({
+    debug: false,
+    sampleRate: 1  // 100% dari pageview dilacak
+});
+```
+
+### Pengaturan Sample Rate
+
+Jika traffic tinggi dan ingin mengurangi biaya, ubah `sampleRate`:
+
+```javascript
+sampleRate: 0.5  // 50% dari pageview
+sampleRate: 0.1  // 10% dari pageview
+```
+
+## Melihat Data Speed Insights
+
+1. Buka Dashboard Vercel
+2. Pilih project aplikasi ini
+3. Navigasi ke tab **Speed Insights**
+4. Lihat metrik performa real-time dari pengguna
+
+## Update Dependency
+
+Untuk memperbarui Speed Insights ke versi terbaru:
+
+```bash
+npm install @vercel/speed-insights@latest
+```
+
+File JavaScript akan otomatis disalin ke `static/js/vendor/` saat menjalankan `npm install` berkat script `postinstall` di `package.json`.
+
+---
+
 # Struktur Repository
 
 ```text
@@ -904,7 +966,9 @@ Disarankan menguji vendor dengan periode pendek terlebih dahulu sebelum melakuka
 │   └── js/
 │       ├── common.js                     # theme + helper UI bersama
 │       ├── index.js                      # logika halaman Olah Data
-│       └── monitoring.js                 # logika halaman Monitoring
+│       ├── monitoring.js                 # logika halaman Monitoring
+│       └── vendor/
+│           └── speed-insights.js         # Vercel Speed Insights
 ├── data/
 │   ├── station_aliases.json              # override nama pos seluruh vendor
 │   ├── beacon/
@@ -921,6 +985,8 @@ Disarankan menguji vendor dengan periode pendek terlebih dahulu sebelum melakuka
 │       └── parameter_catalog.json
 ├── config.py
 ├── requirements.txt
+├── package.json                          # Node.js dependencies (Speed Insights)
+├── package-lock.json                     # Node.js lock file
 ├── vercel.json
 ├── run.bat
 ├── .gitignore

@@ -48,6 +48,11 @@ def index():
     )
 
 
+@app.get("/spasial")
+def spatial_page():
+    return render_template("spatial.html")
+
+
 def require_server_access():
     if not core.APP_PASSWORDS:
         return jsonify(

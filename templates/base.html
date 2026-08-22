@@ -1,83 +1,70 @@
-<!DOCTYPE html>
-<html lang="id" data-telemetry-authenticated="{{ 'true' if ui_authenticated else 'false' }}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#223468">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2086%2086%27%3E%3Crect%20width%3D%2786%27%20height%3D%2786%27%20rx%3D%2710%27%20fill%3D%27white%27/%3E%3Cpath%20fill-rule%3D%27evenodd%27%20clip-rule%3D%27evenodd%27%20d%3D%27M0%200.00011675V55.3629C3.54395%2055.3629%2012.4954%2055.4861%2015.457%2055.26C23.524%2054.6427%2030.6284%2050.7759%2035.1469%2045.217C45.075%2033.0049%2040.7623%2015.6992%2025.467%208.49304C21.6204%206.68051%2018.0392%205.99134%2013.0231%205.78658L13.017%200L0%200.00011675ZM47.8102%200.00011675V45.4919C47.8102%2049.1891%2047.6306%2057.5263%2047.8497%2060.6592C48.4102%2068.6684%2056.2071%2075.4831%2066.13%2074.6383C72.9305%2074.0596%2078.2129%2069.9303%2080.3137%2064.4055C81.2237%2060.9852%2081.0335%2059.7575%2081.2686%2057.5415L85.9998%2057.5377V0.00011675H47.8102ZM24.6346%2065.048C14.7606%2065.5609%206.15118%2072.4938%204.76679%2081.3224C4.49725%2082.9749%204.24787%2084.3788%204.24681%2085.9959L0%2085.9997H46.6318C46.584%2084.3208%2046.7487%2083.1064%2046.4757%2081.3657C45.5102%2075.2097%2040.9113%2069.4769%2034.7099%2066.843C31.3586%2065.4199%2027.926%2064.8771%2024.6346%2065.048Z%27%20fill%3D%27%23FCB717%27/%3E%3Cpath%20fill-rule%3D%27evenodd%27%20clip-rule%3D%27evenodd%27%20d%3D%27M13.0173%200.00012207L13.0234%205.7867C18.0394%205.99145%2021.6207%206.68063%2025.4672%208.49316C40.7626%2015.6993%2045.0753%2033.005%2035.1471%2045.2172C30.6286%2050.7761%2023.5243%2054.6428%2015.4572%2055.2601C12.4957%2055.4862%203.5442%2055.363%200.000244141%2055.363V86L4.24705%2085.9962C4.24811%2084.379%204.49749%2082.9751%204.76703%2081.3226C6.61288%2069.5512%2021.3048%2061.1509%2034.7102%2066.8433C40.9116%2069.4772%2045.5105%2075.21%2046.4759%2081.3661C46.7489%2083.1068%2046.5843%2084.3212%2046.6321%2086.0001H86V57.5378L81.2688%2057.5416C81.0337%2059.7576%2081.224%2060.9853%2080.3139%2064.4056C78.2132%2069.9304%2072.9307%2074.0597%2066.1302%2074.6384C56.2074%2075.4832%2048.4104%2068.6685%2047.85%2060.6593C47.6308%2057.5264%2047.8104%2049.1891%2047.8104%2045.492V0.00012207H13.0173Z%27%20fill%3D%27%23223468%27/%3E%3C/svg%3E">
-    <title>{% block title %}Monitoring Hidrologi{% endblock %}</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/css/bootstrap-datepicker.standalone.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/locales/bootstrap-datepicker.id.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/ui-components.css') }}">
-    <script>
-        window.__HYDRO_AUTH_BOOTSTRAP__ = {{ {
-            "authenticated": ui_authenticated | default(false),
-            "configured": ui_auth_configured | default(false)
-        } | tojson }};
-    </script>
-    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
-    {% block head_extra %}{% endblock %}
-</head>
-<body class="{% block body_class %}{% endblock %}">
-    <header class="app-header">
-        <div class="app-header-main">
-            <a class="official-brand" href="{{ url_for('index') }}" aria-label="BBWS Serayu Opak">
-                <svg class="official-logo" viewBox="0 0 86 86" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Logo Kementerian Pekerjaan Umum">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M0 0.00011675V55.3629C3.54395 55.3629 12.4954 55.4861 15.457 55.26C23.524 54.6427 30.6284 50.7759 35.1469 45.217C45.075 33.0049 40.7623 15.6992 25.467 8.49304C21.6204 6.68051 18.0392 5.99134 13.0231 5.78658L13.017 0L0 0.00011675ZM47.8102 0.00011675V45.4919C47.8102 49.1891 47.6306 57.5263 47.8497 60.6592C48.4102 68.6684 56.2071 75.4831 66.13 74.6383C72.9305 74.0596 78.2129 69.9303 80.3137 64.4055C81.2237 60.9852 81.0335 59.7575 81.2686 57.5415L85.9998 57.5377V0.00011675H47.8102ZM24.6346 65.048C14.7606 65.5609 6.15118 72.4938 4.76679 81.3224C4.49725 82.9749 4.24787 84.3788 4.24681 85.9959L0 85.9997H46.6318C46.584 84.3208 46.7487 83.1064 46.4757 81.3657C45.5102 75.2097 40.9113 69.4769 34.7099 66.843C31.3586 65.4199 27.926 64.8771 24.6346 65.048Z" fill="#FCB717"/>
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M13.0173 0.00012207L13.0234 5.7867C18.0394 5.99145 21.6207 6.68063 25.4672 8.49316C40.7626 15.6993 45.0753 33.005 35.1471 45.2172C30.6286 50.7761 23.5243 54.6428 15.4572 55.2601C12.4957 55.4862 3.5442 55.363 0.000244141 55.363V86L4.24705 85.9962C4.24811 84.379 4.49749 82.9751 4.76703 81.3226C6.61288 69.5512 21.3048 61.1509 34.7102 66.8433C40.9116 69.4772 45.5105 75.21 46.4759 81.3661C46.7489 83.1068 46.5843 84.3212 46.6321 86.0001H86V57.5378L81.2688 57.5416C81.0337 59.7576 81.224 60.9853 80.3139 64.4056C78.2132 69.9304 72.9307 74.0597 66.1302 74.6384C56.2074 75.4832 48.4104 68.6685 47.85 60.6593C47.6308 57.5264 47.8104 49.1891 47.8104 45.492V0.00012207H13.0173Z" fill="#223468"/>
-                </svg>
-                <span class="agency-copy">
-                    <span class="agency-overline">KEMENTERIAN PEKERJAAN UMUM</span>
-					<span class="agency-subline">DIREKTORAT JENDERAL SUMBER DAYA AIR</span>
-                    <strong>BALAI BESAR WILAYAH SUNGAI SERAYU OPAK</strong>
-                </span>
-            </a>
+from pathlib import Path
 
-            <div class="header-actions">
-                <button class="connection-status {{ 'connected' if ui_authenticated else 'disconnected' }}" id="connectionStatus" type="button" title="{{ 'Terhubung ke server telemetri' if ui_authenticated else 'Belum login — mode manual' }}" aria-label="{{ 'Terhubung ke server telemetri' if ui_authenticated else 'Belum login — mode manual' }}">
-                    <i data-lucide="{{ 'wifi' if ui_authenticated else 'wifi-off' }}" id="connectionIcon"></i>
-                    <span id="connectionText">{{ 'Terhubung' if ui_authenticated else 'Manual' }}</span>
-                </button>
-                <button class="theme-toggle-btn" id="themeToggleBtn" title="Ubah tema tampilan" aria-label="Ubah tema tampilan" type="button">
-                    <i data-lucide="moon" id="themeIcon"></i>
-                </button>
-            </div>
+src = Path("/mnt/data/base.html")
+out_dir = Path("/mnt/data/base_spasial_overlay")
+out_dir.mkdir(parents=True, exist_ok=True)
+out = out_dir / "base.html"
 
-            <nav class="app-nav" aria-label="Navigasi utama">
-                <span class="app-nav-link disabled" aria-disabled="true" title="Fitur Spasial akan datang">
-                    <i data-lucide="map"></i><span>Spasial · Akan Datang</span>
+text = src.read_text(encoding="utf-8")
+
+# Tambahkan style kecil khusus badge "Akan Datang"
+style_anchor = """    <link rel="stylesheet" href="{{ url_for('static', filename='css/ui-components.css') }}">
+"""
+style_block = """    <link rel="stylesheet" href="{{ url_for('static', filename='css/ui-components.css') }}">
+    <style>
+        .spatial-coming-link {
+            position: relative;
+        }
+
+        .spatial-coming-label {
+            position: relative;
+            display: inline-block;
+        }
+
+        .spatial-coming-badge {
+            position: absolute;
+            top: -0.55rem;
+            left: 55%;
+            z-index: 2;
+            color: #dc2626;
+            font-size: 0.58rem;
+            font-style: italic;
+            font-weight: 800;
+            line-height: 1;
+            white-space: nowrap;
+            letter-spacing: -0.02em;
+            transform: rotate(-8deg);
+            pointer-events: none;
+        }
+    </style>
+"""
+
+if style_anchor not in text:
+    raise RuntimeError("Anchor stylesheet tidak ditemukan.")
+text = text.replace(style_anchor, style_block, 1)
+
+nav_anchor = """            <nav class="app-nav" aria-label="Navigasi utama">
+                <a href="{{ url_for('index') }}" class="app-nav-link {% block nav_olah_class %}{% endblock %}">
+                    <i data-lucide="chart-no-axes-combined"></i><span>Pengolahan</span>
+                </a>
+"""
+
+nav_replacement = """            <nav class="app-nav" aria-label="Navigasi utama">
+                <span class="app-nav-link disabled spatial-coming-link" aria-disabled="true" title="Fitur Spasial akan datang">
+                    <i data-lucide="map"></i>
+                    <span class="spatial-coming-label">
+                        Spasial
+                        <span class="spatial-coming-badge">Akan Datang</span>
+                    </span>
                 </span>
                 <a href="{{ url_for('index') }}" class="app-nav-link {% block nav_olah_class %}{% endblock %}">
                     <i data-lucide="chart-no-axes-combined"></i><span>Pengolahan</span>
                 </a>
-                <a href="{{ url_for('monitoring_page') }}" id="monitorNavLink" class="app-nav-link {% block nav_monitor_class %}{% endblock %}{{ '' if ui_authenticated else ' disabled' }}" data-auth-required="true" aria-disabled="{{ 'false' if ui_authenticated else 'true' }}"{% if not ui_authenticated %} tabindex="-1"{% endif %}>
-                    <i data-lucide="table-properties"></i><span>Monitoring</span>
-                </a>
-            </nav>
-        </div>
+"""
 
-        <div class="app-header-context">
-            <div class="page-heading">
-                <h1>{% block page_title %}Olah Data Hidrologi{% endblock %}</h1>
-                <p>{% block page_subtitle %}{% endblock %}</p>
-            </div>
-        </div>
-    </header>
+if nav_anchor not in text:
+    raise RuntimeError("Blok navigasi target tidak ditemukan.")
+text = text.replace(nav_anchor, nav_replacement, 1)
 
-    <main class="container app-shell">
-        {% block content %}{% endblock %}
-    </main>
-
-    <footer class="app-footer">
-        <span>© 2026 Unit Hidrologi dan Kualitas Air BBWS Serayu Opak</span>
-        <span>v1.6.0.1 · Pre-QC</span>
-    </footer>
-    {% block scripts %}{% endblock %}
-</body>
-</html>
+out.write_text(text, encoding="utf-8")
+print(f"Selesai: {out}")

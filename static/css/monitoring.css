@@ -29,6 +29,72 @@
 .monitoring-page .period-detail.one { grid-template-columns: 1fr; }
 .monitoring-page .period-detail > * { min-width: 0; }
 .monitoring-page .period-detail[hidden] { display: none !important; }
+
+.monitor-logger-filter { position: relative; }
+.monitor-logger-trigger {
+    width: 100%;
+    min-height: 36px;
+    padding: 8px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: var(--input-bg, var(--card-bg));
+    color: var(--text-main);
+    font: inherit;
+    font-size: .63rem;
+    font-weight: 650;
+    text-align: left;
+    cursor: pointer;
+}
+.monitor-logger-trigger:hover,
+.monitor-logger-trigger[aria-expanded="true"] { border-color: var(--component-icon); }
+.monitor-logger-trigger svg {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 auto;
+    color: var(--component-icon);
+    transition: transform .16s ease;
+}
+.monitor-logger-trigger[aria-expanded="true"] svg { transform: rotate(180deg); }
+.monitor-logger-menu {
+    position: absolute;
+    z-index: 60;
+    top: calc(100% + 5px);
+    left: 0;
+    right: 0;
+    padding: 6px;
+    border: 1px solid var(--border-color);
+    border-radius: 9px;
+    background: var(--surface-raised, var(--card-bg));
+    box-shadow: var(--shadow-md, 0 10px 24px rgba(18, 32, 73, .15));
+}
+.monitor-logger-menu[hidden] { display: none !important; }
+.monitor-logger-option {
+    min-height: 31px;
+    padding: 6px 7px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-main);
+    font-size: .61rem;
+    font-weight: 650;
+    cursor: pointer;
+    user-select: none;
+}
+.monitor-logger-option:hover { background: var(--surface-soft); }
+.monitor-logger-option--all { font-weight: 800; }
+.monitor-logger-option input {
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    accent-color: var(--component-icon);
+    cursor: pointer;
+}
+.monitor-logger-divider { height: 1px; margin: 4px 5px; background: var(--border-color); }
 .monitor-date-wrap { position: relative; }
 .monitor-date-wrap input { padding-right: 34px !important; cursor: pointer; }
 .monitor-date-wrap svg {

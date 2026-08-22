@@ -14,7 +14,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
-from urllib.parse import urljoin, urlparse
+from urllib.parse import quote_plus, urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -256,9 +256,16 @@ HIGERTECH_CHUNK_MONTHS = max(1, min(12, int(
 
 # Safe request concurrency. Each vendor keeps its own conservative limit so
 # upstream telemetry servers are not flooded. Beacon parallelism is applied
-# only to /analisa/data_chunk AFTER one set_token has produced a stable token.
+# only to /analisa/data_chunk after one parameter-specific token is ready.
 BEACON_PARALLEL_WORKERS = max(1, min(4, int(
     get_config("BEACON_PARALLEL_WORKERS", 3)
+)))
+
+# Pengolahan BBWS fast-token cache. A set_sensordash token is tied to one
+# logger/parameter pair and can be reused for independent data_chunk periods
+# while the authenticated Beacon session remains warm.
+BEACON_PROCESS_TOKEN_TTL = max(30, min(15 * 60, int(
+    get_config("BEACON_PROCESS_TOKEN_TTL", 5 * 60)
 )))
 
 HIGERTECH_PARALLEL_WORKERS = max(1, min(6, int(
@@ -275,6 +282,28 @@ HIGERTECH_EXPORT_CACHE_MAX = max(1, int(
 
 HIGERTECH_EXPORT_TIMEOUT = max(30, min(180, int(
     get_config("HIGERTECH_EXPORT_TIMEOUT", 120)
+)))
+
+# Pengolahan Higertech: prefer the vendor's lightweight native 5-minute JSON
+# chart endpoint for daily/monthly/range requests, then let the existing
+# frontend aggregation work from raw points. Long ranges fall back to XLSX.
+HIGERTECH_CHART_DAY_WORKERS = max(1, min(12, int(
+    get_config("HIGERTECH_CHART_DAY_WORKERS", 8)
+)))
+HIGERTECH_CHART_TIMEOUT = max(2.0, min(30.0, float(
+    get_config("HIGERTECH_CHART_TIMEOUT", 8)
+)))
+HIGERTECH_CHART_MAX_DAYS = max(1, min(120, int(
+    get_config("HIGERTECH_CHART_MAX_DAYS", 62)
+)))
+HIGERTECH_CHART_CACHE_TTL = max(60, min(24 * 60 * 60, int(
+    get_config("HIGERTECH_CHART_CACHE_TTL", 6 * 60 * 60)
+)))
+HIGERTECH_CHART_TODAY_CACHE_TTL = max(15, min(10 * 60, int(
+    get_config("HIGERTECH_CHART_TODAY_CACHE_TTL", 60)
+)))
+HIGERTECH_CHART_CACHE_MAX = max(16, min(1024, int(
+    get_config("HIGERTECH_CHART_CACHE_MAX", 256)
 )))
 
 USERNAME = str(
@@ -351,6 +380,7 @@ HIGERTECH_LOGIN_URL = f"{HIGERTECH_BASE_URL}/Account/Login"
 HIGERTECH_DOWNLOAD_PAGE_URL = f"{HIGERTECH_BASE_URL}/DownloadData"
 HIGERTECH_STATIONS_URL = f"{HIGERTECH_BASE_URL}/DownloadData/GetDatatableStation"
 HIGERTECH_EXPORT_URL = f"{HIGERTECH_BASE_URL}/DownloadData/Export"
+HIGERTECH_CHART_URL = f"{HIGERTECH_BASE_URL}/Station/GetChartDataAwlrArr"
 
 
 # ============================================================
@@ -391,6 +421,11 @@ DASHINDO_PARALLEL_WORKERS = max(1, min(4, int(
 DASHINDO_CHUNK_MONTHS = max(1, min(6, int(
     get_config("DASHINDO_CHUNK_MONTHS", 3)
 )))
+# Pengolahan uses native get_n_data (raw minute/sub-minute samples) instead of
+# downloadcsv. CSV remains a reliability fallback.
+DASHINDO_DIRECT_RAW_ENABLED = str(
+    get_config("DASHINDO_DIRECT_RAW_ENABLED", "1")
+).strip().lower() not in {"0", "false", "no", "off"}
 DASHINDO_TZ_OFFSET_HOURS = 7
 
 
@@ -498,6 +533,8 @@ _HIGERTECH_STATION_CACHE: tuple[float, list[dict[str, str]]] | None = (
     else None
 )
 _HIGERTECH_EXPORT_CACHE: dict[tuple[str, str, str], tuple[float, bytes]] = {}
+_HIGERTECH_CHART_CACHE: dict[tuple[str, str], tuple[float, list[dict[str, Any]]]] = {}
+_HIGERTECH_CHART_CACHE_LOCK = threading.RLock()
 HIGERTECH_SESSION_TTL = 15 * 60
 HIGERTECH_STATION_CACHE_TTL = 6 * 60 * 60
 
@@ -978,7 +1015,7 @@ def _higertech_export_month(
     return content
 
 
-def higertech_data(
+def _higertech_data_xlsx(
     device_id: str,
     dari: str,
     sampai: str,
@@ -1060,6 +1097,210 @@ def higertech_data(
     filtered.sort(key=lambda row: str(row[0]))
     return canonical_headers, filtered, station
 
+
+
+def _higertech_chart_cache_get(device_id: str, day_key: str) -> list[dict[str, Any]] | None:
+    key = (str(device_id), str(day_key))
+    now = time.time()
+    today_key = now_wib_naive().date().isoformat()
+    ttl = HIGERTECH_CHART_TODAY_CACHE_TTL if day_key == today_key else HIGERTECH_CHART_CACHE_TTL
+    with _HIGERTECH_CHART_CACHE_LOCK:
+        item = _HIGERTECH_CHART_CACHE.get(key)
+        if not item:
+            return None
+        created_at, rows = item
+        if now - created_at >= ttl:
+            _HIGERTECH_CHART_CACHE.pop(key, None)
+            return None
+        return list(rows)
+
+
+def _higertech_chart_cache_put(device_id: str, day_key: str, rows: list[dict[str, Any]]) -> None:
+    key = (str(device_id), str(day_key))
+    with _HIGERTECH_CHART_CACHE_LOCK:
+        _HIGERTECH_CHART_CACHE[key] = (time.time(), list(rows))
+        if len(_HIGERTECH_CHART_CACHE) > HIGERTECH_CHART_CACHE_MAX:
+            oldest = min(_HIGERTECH_CHART_CACHE, key=lambda k: _HIGERTECH_CHART_CACHE[k][0])
+            _HIGERTECH_CHART_CACHE.pop(oldest, None)
+
+
+def _higertech_chart_day(device_id: str, day_key: str) -> list[dict[str, Any]]:
+    cached = _higertech_chart_cache_get(device_id, day_key)
+    if cached is not None:
+        return cached
+
+    headers = {
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        "X-Requested-With": "XMLHttpRequest",
+        "Origin": HIGERTECH_BASE_URL,
+        "Referer": f"{HIGERTECH_BASE_URL}/Station",
+    }
+    payload = {
+        "deviceId": str(device_id),
+        "selectedTime": "minute",
+        "filterDate": str(day_key),
+    }
+
+    def request_once(*, force_login: bool = False) -> requests.Response:
+        if force_login:
+            _higertech_login(force=True)
+        client = _higertech_clone_authenticated_session()
+        return client.post(
+            HIGERTECH_CHART_URL,
+            data=payload,
+            headers=headers,
+            timeout=HIGERTECH_CHART_TIMEOUT,
+            allow_redirects=True,
+        )
+
+    response = request_once()
+    if response.status_code in (401, 403) or "/account/login" in response.url.lower():
+        response = request_once(force_login=True)
+    response.raise_for_status()
+
+    text = response.text.strip()
+    if not text:
+        rows: list[dict[str, Any]] = []
+    else:
+        ctype = (response.headers.get("Content-Type") or "").lower()
+        if "text/html" in ctype or "/account/login" in response.url.lower():
+            response = request_once(force_login=True)
+            response.raise_for_status()
+            text = response.text.strip()
+            if not text:
+                rows = []
+            else:
+                if "text/html" in (response.headers.get("Content-Type") or "").lower():
+                    raise RuntimeError("Higertech mengembalikan HTML saat meminta chart 5 menit.")
+                payload_json = response.json()
+                rows = payload_json.get("data") or [] if isinstance(payload_json, dict) else []
+        else:
+            payload_json = response.json()
+            rows = payload_json.get("data") or [] if isinstance(payload_json, dict) else []
+
+    if not isinstance(rows, list):
+        raise RuntimeError("Format data chart 5 menit Higertech tidak valid.")
+    cleaned = [row for row in rows if isinstance(row, dict)]
+    _higertech_chart_cache_put(device_id, day_key, cleaned)
+    return cleaned
+
+
+def _parse_higertech_chart_local_time(row: dict[str, Any]) -> datetime | None:
+    raw = clean_text(str(row.get("readingAt") or ""))
+    if raw:
+        # Vendor emits local WIB wall-clock time with a misleading trailing Z.
+        try:
+            return datetime.fromisoformat(raw[:-1] if raw.endswith("Z") else raw).replace(tzinfo=None)
+        except ValueError:
+            pass
+    raw_utc = clean_text(str(row.get("readingAtUtc") or ""))
+    if raw_utc:
+        try:
+            utc_naive = datetime.fromisoformat(raw_utc[:-1] if raw_utc.endswith("Z") else raw_utc).replace(tzinfo=None)
+            return utc_naive + timedelta(hours=7)
+        except ValueError:
+            pass
+    return None
+
+
+def _higertech_data_chart(
+    device_id: str,
+    dari: str,
+    sampai: str,
+    parameter_id: str,
+) -> tuple[list[str], list[list[Any]], dict[str, str]]:
+    station = _higertech_station_by_device(device_id)
+    start_dt = datetime.strptime(dari[:16], "%Y-%m-%d %H:%M")
+    end_dt = datetime.strptime(sampai[:16], "%Y-%m-%d %H:%M")
+    if end_dt < start_dt:
+        raise RuntimeError("Tanggal akhir lebih kecil dari tanggal awal.")
+
+    span_days = (end_dt.date() - start_dt.date()).days + 1
+    if span_days > HIGERTECH_CHART_MAX_DAYS:
+        raise RuntimeError("Rentang terlalu panjang untuk fast chart Higertech.")
+
+    if parameter_id == "tma":
+        value_key = "waterLevel"
+        output_header = "Tinggi Muka Air"
+    elif parameter_id == "rain":
+        value_key = "rainfall"
+        output_header = "Curah Hujan"
+    else:
+        raise RuntimeError("Parameter Higertech tidak dikenali.")
+
+    days: list[str] = []
+    cursor = start_dt.date()
+    while cursor <= end_dt.date():
+        days.append(cursor.isoformat())
+        cursor += timedelta(days=1)
+
+    parts: dict[str, list[dict[str, Any]]] = {}
+    workers = min(HIGERTECH_CHART_DAY_WORKERS, len(days) or 1)
+    if workers > 1 and len(days) > 1:
+        with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="higertech-chart") as executor:
+            futures = {executor.submit(_higertech_chart_day, device_id, day): day for day in days}
+            for future in as_completed(futures):
+                day = futures[future]
+                parts[day] = future.result()
+    else:
+        for day in days:
+            parts[day] = _higertech_chart_day(device_id, day)
+
+    merged: dict[str, float] = {}
+    for day in days:
+        for item in parts.get(day, []):
+            dt = _parse_higertech_chart_local_time(item)
+            if dt is None or dt < start_dt or dt > end_dt:
+                continue
+            raw_value = item.get(value_key)
+            if raw_value is None or clean_text(str(raw_value)) == "":
+                continue
+            try:
+                value = float(str(raw_value).strip().replace(",", "."))
+            except (TypeError, ValueError):
+                continue
+            merged[dt.strftime("%Y-%m-%d %H:%M:%S")] = value
+
+    rows = [[stamp, merged[stamp]] for stamp in sorted(merged)]
+    return ["Waktu", output_header], rows, station
+
+
+def higertech_data(
+    device_id: str,
+    dari: str,
+    sampai: str,
+    parameter_id: str,
+    *,
+    isolated_session: bool = False,
+) -> tuple[list[str], list[list[Any]], dict[str, str]]:
+    """Pengolahan Higertech fast path using native 5-minute JSON.
+
+    The raw 5-minute values are returned unchanged to the existing processing
+    pipeline, so hourly/daily aggregation remains application-owned. The proven
+    XLSX export is kept as a fail-safe and for long ranges where hundreds of
+    daily chart requests would be less efficient.
+    """
+    try:
+        return _higertech_data_chart(device_id, dari, sampai, parameter_id)
+    except Exception as chart_exc:
+        # Preserve the established XLSX path for reliability. Long-range chart
+        # rejection is expected and should silently choose the monthly export.
+        try:
+            return _higertech_data_xlsx(
+                device_id,
+                dari,
+                sampai,
+                parameter_id,
+                isolated_session=isolated_session,
+            )
+        except Exception:
+            # If both routes fail, the lightweight route usually carries the
+            # most actionable auth/format error; for intentional long-range
+            # fallback the XLSX exception is more useful.
+            if "Rentang terlalu panjang" not in str(chart_exc):
+                raise chart_exc
+            raise
 
 def higertech_parameters_for(data_type: str) -> list[dict[str, str]]:
     if data_type == "rain":
@@ -1664,6 +1905,97 @@ def _dashindo_websocket_auth(
     return payload["data"]
 
 
+
+def _dashindo_get_n_data(
+    client: requests.Session,
+    device: str,
+    field: str,
+    tss: str,
+    tse: str,
+) -> dict[str, Any]:
+    """Fetch Dashindo raw minute/sub-minute telemetry directly as JSON.
+
+    The vendor's own sensor page emits get_n_data(device, field, [tss, tse]) and
+    receives n_data {times, values}. The supplied HAR confirms this contains the
+    same raw samples as download_csv, but avoids CSV generation, Base64 transfer,
+    decoding, and DictReader parsing.
+    """
+    trace: list[str] = []
+    engine = _DashindoEngineIO(http=client, trace=trace)
+    deadline = time.monotonic() + DASHINDO_WAIT_TIMEOUT
+
+    try:
+        engine.open()
+        engine.post_raw("40")
+        _event, ehlo = engine.poll_until({"ehlo"}, deadline)
+        if not isinstance(ehlo, dict) or not ehlo.get("key"):
+            raise DashindoError("Event ehlo Dashindo tidak memiliki key.")
+
+        auth_data = _dashindo_websocket_auth(client, str(ehlo["key"]))
+        engine.send_event("message", auth_data)
+        engine.poll_until({"auth"}, deadline)
+
+        engine.send_event("get_n_data", device, field, [tss, tse])
+        _event, data = engine.poll_until({"n_data"}, deadline)
+        if not isinstance(data, dict):
+            raise DashindoError("Payload n_data Dashindo tidak valid.")
+        times = data.get("times")
+        values = data.get("values")
+        if not isinstance(times, list) or not isinstance(values, list):
+            raise DashindoError("Payload n_data Dashindo tidak memiliki times/values.")
+        return data
+    except requests.RequestException as exc:
+        raise DashindoError(
+            "Gagal berkomunikasi dengan Engine.IO Dashindo: "
+            f"{exc}. Trace: {' -> '.join(trace)}"
+        ) from exc
+    finally:
+        engine.close()
+
+
+def _dashindo_n_data_rows(
+    data: dict[str, Any],
+    start_dt: datetime,
+    end_dt: datetime,
+) -> list[list[Any]]:
+    """Normalize direct n_data while preserving Pengolahan's old time semantics.
+
+    n_data and download_csv expose the same source timestamp strings. The legacy
+    Pengolahan CSV adapter treated those strings as UTC-naive then converted +7
+    hours to WIB. Keep exactly that transform here so this performance change
+    does not silently shift existing processed results.
+    """
+    times = data.get("times")
+    values = data.get("values")
+    if not isinstance(times, list) or not isinstance(values, list):
+        raise DashindoError("Payload n_data Dashindo tidak valid.")
+
+    rows: list[list[Any]] = []
+    seen: set[tuple[str, str]] = set()
+    for raw_time, raw_value in zip(times, values):
+        try:
+            dt_utc = datetime.strptime(str(raw_time).strip(), "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
+            dt = dt_utc.astimezone(
+                timezone(timedelta(hours=DASHINDO_TZ_OFFSET_HOURS))
+            ).replace(tzinfo=None)
+        except ValueError:
+            continue
+        if dt < start_dt or dt > end_dt:
+            continue
+        try:
+            value = float(str(raw_value).strip().replace(",", "."))
+        except (TypeError, ValueError):
+            continue
+        stamp = dt.strftime("%Y-%m-%d %H:%M:%S")
+        key = (stamp, str(value))
+        if key in seen:
+            continue
+        seen.add(key)
+        rows.append([stamp, value])
+
+    rows.sort(key=lambda row: row[0])
+    return rows
+
 def _dashindo_download_csv(
     client: requests.Session,
     device: str,
@@ -1888,6 +2220,21 @@ def dashindo_data(
         for attempt in range(2):
             try:
                 client = _dashindo_login()
+                if DASHINDO_DIRECT_RAW_ENABLED:
+                    try:
+                        data = _dashindo_get_n_data(
+                            client=client, device=station["device"], field=station["field"],
+                            tss=period[0], tse=period[1],
+                        )
+                        return _dashindo_n_data_rows(
+                            data=data, start_dt=start_dt, end_dt=end_dt,
+                        )
+                    except Exception:
+                        # Reliability fallback: preserve the proven raw CSV path.
+                        # Both paths carry raw minute/sub-minute data; aggregation
+                        # remains in the existing Pengolahan pipeline.
+                        pass
+
                 raw = _dashindo_download_csv(
                     client=client, device=station["device"], field=station["field"],
                     tss=period[0], tse=period[1],
@@ -3635,6 +3982,11 @@ class BBWSSession:
 
         self.last_login_at = 0.0
 
+        # Pengolahan-only cache of parameter-specific BBWS set_sensordash
+        # tokens. Kept on this authenticated client so a forced re-login can
+        # invalidate all entries safely.
+        self._sensor_token_cache: dict[tuple[str, str], tuple[float, str, str]] = {}
+
     # --------------------------------------------------------
     # TRACE
     # --------------------------------------------------------
@@ -3749,6 +4101,7 @@ class BBWSSession:
             self.logged_in = False
             self.token = None
             self.current_url = ""
+            self._sensor_token_cache.clear()
 
             try:
                 self.session.close()
@@ -3998,19 +4351,54 @@ class BBWSSession:
             raise RuntimeError("Payload data_chunk Beacon tidak valid.")
 
         status = clean_text(str(payload.get("status", ""))).lower()
+        raw_data = payload.get("data")
         table = payload.get("data_tabel")
+        if not isinstance(raw_data, list):
+            raw_data = []
         if not isinstance(table, list):
             table = []
 
-        # Beacon can legitimately return an empty table outside a logger's
+        # Beacon can legitimately return an empty series outside a logger's
         # recording lifetime. Treat that as EMPTY, not a failed request.
-        if status and status not in {"ok", "success"} and not table:
+        if status and status not in {"ok", "success"} and not raw_data and not table:
             msg = clean_text(str(payload.get("message") or payload.get("error") or status))
             if any(k in msg.lower() for k in ("no data", "tidak ada data", "empty", "kosong")):
                 return []
             raise RuntimeError(f"data_chunk Beacon gagal: {msg}")
 
+        # IMPORTANT: /analisa/data_chunk exposes the canonical time series in
+        # ``data`` as [epoch_milliseconds, value]. ``data_tabel`` is a display
+        # helper used by Beacon's page and, for some responses, its ``waktu``
+        # value is only a row/index-like number. Passing that number to the
+        # frontend date parser produced the 1899-12-30 / 1900-01-xx dates seen
+        # in Pengolahan V26. Monitoring already uses ``data`` correctly, so the
+        # processing adapter now follows the same source of truth.
         rows: list[list[str]] = []
+        for item in raw_data:
+            if not isinstance(item, (list, tuple)) or len(item) < 2:
+                continue
+            try:
+                # Use utcfromtimestamp intentionally: Beacon's chart/table
+                # clock is represented directly by this epoch value. This also
+                # avoids host/Vercel timezone differences.
+                dt = datetime.utcfromtimestamp(float(item[0]) / 1000.0)
+            except (TypeError, ValueError, OSError, OverflowError):
+                continue
+            value = item[1]
+            if value is None or clean_text(str(value)) == "":
+                continue
+            rows.append([
+                dt.strftime("%Y-%m-%d %H:%M:%S"),
+                clean_text(str(value)),
+            ])
+
+        if rows:
+            return rows
+
+        # Compatibility fallback only for an upstream response that does not
+        # contain ``data``. Accept data_tabel timestamps only when they parse as
+        # a real datetime, preventing numeric row indexes from becoming Excel
+        # epoch dates in the frontend.
         for item in table:
             if not isinstance(item, dict):
                 continue
@@ -4018,9 +4406,13 @@ class BBWSSession:
             value = item.get("dta")
             if value is None:
                 value = item.get("value")
-            if not stamp or value is None or clean_text(str(value)) == "":
+            parsed_stamp = _parse_any_datetime(stamp)
+            if parsed_stamp is None or value is None or clean_text(str(value)) == "":
                 continue
-            rows.append([stamp, clean_text(str(value))])
+            rows.append([
+                parsed_stamp.strftime("%Y-%m-%d %H:%M:%S"),
+                clean_text(str(value)),
+            ])
         return rows
 
     # --------------------------------------------------------
@@ -4384,6 +4776,125 @@ class BBWSSession:
         all_rows.sort(key=lambda row: row[0] if row else "")
         return all_headers, all_rows, title
 
+    def _bbws_fast_selector_url(self, id_logger: str, id_param: str) -> str:
+        lid = clean_text(str(id_logger))
+        pid = clean_text(str(id_param))
+        lower = lid.lower()
+        if "_bbws" not in lower:
+            raise RuntimeError("Fast selector hanya didukung untuk aset BBWS.")
+        grp_match = re.search(r"_bbws_(\d+)$", lower)
+        suffix = f"&grp={quote_plus(grp_match.group(1))}" if grp_match else ""
+        return (
+            f"{BASE_URL}/analisa/set_sensordash?"
+            f"id_param={quote_plus(pid + '_bbws')}{suffix}"
+        )
+
+    def _prepare_bbws_fast_token(
+        self,
+        id_logger: str,
+        id_param: str,
+        *,
+        force_refresh: bool = False,
+    ) -> tuple[str, str]:
+        """Get a parameter-specific BBWS token without rendering analysis HTML.
+
+        Monitoring proved that /analisa/set_sensordash redirects directly to
+        /analisa/data/<token>. Pengolahan only needs that token for data_chunk,
+        so cold requests can skip GET /analisa + POST set_token + a full result
+        page render. The legacy set_state path remains the fallback.
+        """
+        if not self.logged_in:
+            self.login()
+
+        key = (clean_text(str(id_logger)), clean_text(str(id_param)))
+        now = time.time()
+        if not force_refresh:
+            cached = self._sensor_token_cache.get(key)
+            if cached and now - cached[0] < BEACON_PROCESS_TOKEN_TTL:
+                _created_at, token, current_url = cached
+                self.token = token
+                self.current_url = current_url or f"{BASE_URL}/analisa/data/{token}"
+                return token, "hit"
+        else:
+            self._sensor_token_cache.pop(key, None)
+
+        selector_url = self._bbws_fast_selector_url(id_logger, id_param)
+
+        def select_once() -> tuple[str, str | None]:
+            referer = self.current_url or f"{BASE_URL}/beranda"
+            response = self.session.get(
+                selector_url,
+                headers={"Referer": referer},
+                timeout=max(TIMEOUT, 60),
+                allow_redirects=False,
+            )
+            response.raise_for_status()
+            location = clean_text(str(response.headers.get("Location") or ""))
+            if location:
+                absolute = urljoin(BASE_URL + "/", location)
+                if "/login" in urlparse(absolute).path.lower():
+                    raise RuntimeError("Sesi BBWS kedaluwarsa saat set_sensordash.")
+                match = re.search(r"/analisa/data/([^/?#]+)", absolute)
+                if match:
+                    return absolute, match.group(1)
+
+            # Defensive fallback only when the vendor changes redirect format.
+            followed = self.session.get(
+                selector_url,
+                headers={"Referer": referer},
+                timeout=max(TIMEOUT, 60),
+                allow_redirects=True,
+            )
+            followed.raise_for_status()
+            if looks_like_login(followed.text, followed.url):
+                raise RuntimeError("Sesi BBWS kedaluwarsa saat set_sensordash.")
+            return followed.url, extract_token(followed.text, followed.url)
+
+        try:
+            selected_url, token = select_once()
+        except Exception as first_exc:
+            # One auth refresh protects warm Vercel/local instances whose cookie
+            # expired while the in-memory client itself was still alive.
+            try:
+                self.login(force=True)
+                selected_url, token = select_once()
+            except Exception:
+                raise first_exc
+
+        if not token:
+            raise RuntimeError("Token Beacon tidak ditemukan setelah set_sensordash.")
+
+        current_url = selected_url or f"{BASE_URL}/analisa/data/{token}"
+        self.token = token
+        self.current_url = current_url
+        self._sensor_token_cache[key] = (time.time(), token, current_url)
+        return token, "miss"
+
+    def _prepare_bbws_legacy_token(
+        self,
+        id_logger: str,
+        id_param: str,
+        start: datetime,
+        end: datetime,
+        mode: str,
+    ) -> str:
+        """Original set_token preparation retained as a compatibility fallback."""
+        fmt = "%Y-%m-%d %H:%M"
+        if not self.logged_in:
+            self.login()
+        if not self.token:
+            self.analysis_page()
+        self.set_state(
+            id_logger=id_logger,
+            id_param=id_param,
+            mode=mode,
+            dari=start.strftime(fmt),
+            sampai=end.strftime(fmt),
+        )
+        if not self.token:
+            raise RuntimeError("Token data Beacon tidak ditemukan setelah set_token.")
+        return self.token
+
     def _fetch_historical_data_chunks(
         self,
         id_logger: str,
@@ -4398,23 +4909,15 @@ class BBWSSession:
         """Optimized ``/data_chunk`` path for ``*_bbws`` Beacon assets."""
         fmt = "%Y-%m-%d %H:%M"
 
-        if not self.logged_in:
-            self.login()
-        if not self.token:
-            self.analysis_page()
-
-        # For BBWS assets the upstream chunk API uses the token produced after
-        # setting logger, parameter and requested range once.
-        self.set_state(
-            id_logger=id_logger,
-            id_param=id_param,
-            mode=mode,
-            dari=start.strftime(fmt),
-            sampai=end.strftime(fmt),
-        )
-        token = self.token
-        if not token:
-            raise RuntimeError("Token data Beacon tidak ditemukan setelah set_token.")
+        # Fast path: get/reuse the parameter token directly from set_sensordash.
+        # If Beacon changes that route, fall back to the proven set_token flow.
+        token_status = "legacy"
+        try:
+            token, token_status = self._prepare_bbws_fast_token(id_logger, id_param)
+        except Exception:
+            token = self._prepare_bbws_legacy_token(
+                id_logger=id_logger, id_param=id_param, start=start, end=end, mode=mode
+            )
 
         chunk_days = max(1, min(25, int(BEACON_CHUNK_DAYS)))
         chunks: list[tuple[datetime, datetime]] = []
@@ -4461,6 +4964,24 @@ class BBWSSession:
                     results[i] = rows
                 except Exception as exc:
                     failures[i] = exc
+
+        # A warm cached token can expire independently of the login cookie.
+        # Refresh it once before applying the smaller-range fallback.
+        if failures and token_status == "hit":
+            try:
+                token, _ = self._prepare_bbws_fast_token(
+                    id_logger, id_param, force_refresh=True
+                )
+                retry_indexes = sorted(list(failures))
+                for idx in retry_indexes:
+                    try:
+                        _, rows = run_chunk(idx, chunks[idx])
+                        results[idx] = rows
+                        failures.pop(idx, None)
+                    except Exception as exc:
+                        failures[idx] = exc
+            except Exception:
+                pass
 
         # Timeout/range fallback: retry a failed BBWS chunk as <=12-day pieces.
         for idx in sorted(list(failures)):

@@ -1,8 +1,9 @@
 # Olah Data Hidrologi BBWS Serayu Opak
 
-Aplikasi web untuk membantu pengambilan, normalisasi, pengolahan, visualisasi, dan ekspor data hidrologi dari beberapa sistem telemetry/logger BBWS Serayu Opak dalam satu antarmuka.
+**Versi saat ini: `1.6.0.1` — Pre-QC**  
+Aplikasi web terpadu untuk mengambil, menormalisasi, mengolah, memantau, memvisualisasikan, dan mengekspor data hidrologi dari beberapa sistem telemetry/logger dalam satu antarmuka.
 
-Repository ini menggabungkan integrasi:
+Vendor/sumber yang sudah terintegrasi:
 
 - **Beacon / Monitoring4System**
 - **Tatonas**
@@ -10,580 +11,470 @@ Repository ini menggabungkan integrasi:
 - **Dashindo / Scadash**
 - **Upload Excel/CSV manual**
 
-Pipeline UI/UX dan pemrosesan dibuat tetap seragam meskipun masing-masing vendor memiliki mekanisme login, format data, resolusi, dan endpoint yang berbeda.
+> Status `1.x.x` berarti aplikasi masih berada pada tahap pengembangan dan validasi **sebelum QC formal**. Hasil pengolahan tetap perlu diverifikasi sebelum digunakan sebagai data resmi.
 
-> Aplikasi ini merupakan alat bantu pengolahan. Data hasil proses tetap perlu diverifikasi oleh operator/analis sebelum digunakan sebagai data resmi.
+---
+
+## Skema Versi
+
+Repository sekarang memakai penomoran yang lebih konsisten:
+
+```text
+0.x.x      prototipe / fondasi awal
+1.x.x      pengembangan terpadu sebelum QC
+2.x.x      disiapkan untuk fase setelah QC / rilis operasional
+
+x.y.z      versi fitur normal
+x.y.z.n    hotfix kecil tanpa perubahan fitur utama
+```
+
+Contoh versi saat ini:
+
+```text
+1.6.0      optimasi Pengolahan Beacon, Higertech, Dashindo
+1.6.0.1    hotfix timestamp Beacon BBWS
+```
+
+Nomor lama seperti `V13`, `V24`, atau `V26.1` dipertahankan hanya pada tabel riwayat sebagai referensi terhadap arsip pengembangan lama.
 
 ---
 
 ## Daftar Isi
 
 - [Fitur Utama](#fitur-utama)
-- [Jenis Data](#jenis-data)
-- [Periode Pengolahan](#periode-pengolahan)
-- [Alur Pemrosesan](#alur-pemrosesan)
+- [Arsitektur Aplikasi](#arsitektur-aplikasi)
+- [Pengolahan Data](#pengolahan-data)
+- [Monitoring Telemetri](#monitoring-telemetri)
 - [Integrasi Vendor](#integrasi-vendor)
-  - [Beacon](#1-beacon--monitoring4system)
-  - [Tatonas](#2-tatonas)
-  - [Higertech](#3-higertech)
-  - [Dashindo](#4-dashindo--scadash)
-- [Faktor Koreksi](#faktor-koreksi)
+- [Aturan Pengolahan Data](#aturan-pengolahan-data)
+- [UI Bersama](#ui-bersama)
 - [Menjalankan Secara Lokal](#menjalankan-secara-lokal)
 - [Environment Variables](#environment-variables)
-- [Deploy GitHub + Vercel](#deploy-github--vercel)
+- [Deploy GitHub dan Vercel](#deploy-github-dan-vercel)
 - [Struktur Repository](#struktur-repository)
-- [Keamanan](#keamanan)
-- [Catatan Operasional](#catatan-operasional)
+- [Keamanan dan Operasional](#keamanan-dan-operasional)
+- [Riwayat Versi](#riwayat-versi)
+- [Rencana Pengembangan](#rencana-pengembangan)
 
 ---
 
-## Fitur Utama
+# Fitur Utama
+
+## Pengolahan
 
 - Pengolahan **Curah Hujan** dan **Tinggi Muka Air**.
-- Sumber data server dari Beacon, Tatonas, Higertech, dan Dashindo.
-- Upload Excel/CSV manual sebagai alternatif sumber data.
-- Periode:
+- Sumber **Server Telemetri** atau **Upload File Manual**.
+- Pilihan periode:
   - Harian
   - Bulanan
   - Tahunan
   - Rentang tanggal
-- Normalisasi variasi nama parameter.
-- Pemrosesan data menjadi format jam-jaman.
-- Hari hidrologis curah hujan **07:00–06:59**.
+- Normalisasi format timestamp dan nama parameter antar-vendor.
+- Data sumber tetap dipertahankan pada resolusi yang diperlukan sebelum diagregasi oleh aplikasi.
+- Pengolahan menjadi format jam-jaman.
+- Hari hidrologis Curah Hujan **07:00–06:59**.
 - Faktor koreksi opsional.
-- Ringkasan data minimum, maksimum, dan data terakhir.
 - Grafik time series.
-- Preview hasil.
+- Ringkasan nilai terakhir, tertinggi, terendah, akumulasi/rerata sesuai parameter.
+- Tabel hasil pengolahan.
 - Ekspor Excel `.xlsx`.
-- Password akses fitur Server Telemetri.
-- Backend Flask yang dapat dijalankan lokal maupun di Vercel.
+- Cache sesi untuk pilihan dan hasil Pengolahan.
+
+## Monitoring
+
+- Monitoring terpadu lintas vendor.
+- Filter multi-select **Logger** agar vendor yang tidak diperlukan sama sekali tidak di-request.
+- Kategori utama:
+  - Curah Hujan
+  - Tinggi Muka Air
+- Tampilan jam-jaman atau harian.
+- Orientasi horizontal atau vertikal.
+- Rentang 3, 7, 14, 30 hari dan rentang tanggal sesuai UI yang tersedia.
+- Status ketersediaan data per pos.
+- Ringkasan tertinggi khusus Curah Hujan.
+- Klasifikasi Curah Hujan.
+- Ekspor Excel Monitoring.
+- Diagnostik performa di DevTools untuk debugging local.
+- Fetch antar-vendor berjalan paralel sehingga waktu total mendekati vendor paling lambat, bukan penjumlahan seluruh vendor.
 
 ---
 
-## Jenis Data
+# Arsitektur Aplikasi
 
-### Curah Hujan
-
-Parameter hujan dapat berasal dari beberapa istilah berbeda, misalnya:
-
-- Curah Hujan
-- Rainfall
-- Precipitation
-- Precipitation Intensity
-- variasi nama lain dari masing-masing logger
-
-Untuk parameter hujan utama, hari hidrologis menggunakan:
+Backend menggunakan **Flask** dan dipisahkan menjadi route, adapter vendor, serta service Monitoring.
 
 ```text
-07:00 hari berjalan
-sampai
-06:59 hari berikutnya
+Browser
+   │
+   ├── Pengolahan
+   │      ↓
+   │   /api/... telemetry
+   │      ↓
+   │   adapter vendor
+   │      ↓
+   │   raw normalized rows
+   │      ↓
+   │   agregasi frontend
+   │
+   └── Monitoring
+          ↓
+       /api/monitoring/...
+          ↓
+       vendor fetch paralel
+          ↓
+       normalisasi + agregasi Monitoring
+          ↓
+       tabel/status/grafik
 ```
 
-Contoh periode hidrologis 1 Januari 2026:
+Prinsip utama proyek:
 
-```text
-01 Januari 2026 07:00
-sampai
-02 Januari 2026 06:59
-```
-
-### Tinggi Muka Air
-
-Parameter dapat berasal dari istilah seperti:
-
-- Tinggi Muka Air
-- Water Level
-- Water Stage
-- Elevasi Muka Air
-- nama parameter vendor lainnya
-
-Data kemudian diteruskan ke pipeline pemrosesan utama untuk diringkas sesuai resolusi keluaran aplikasi.
-
-### Parameter Observasi Lain
-
-Pada logger tertentu, katalog server juga dapat mengekspos parameter tambahan seperti:
-
-- Battery Logger
-- Temperature Logger
-- Humidity
-- Tekanan Udara
-- Radiasi
-- UV
-- Arah Angin
-- Kecepatan Angin
-- Pan Level
-- parameter observasi lain yang tersedia dari sumber
+1. UI pengguna tidak bergantung pada UI website vendor.
+2. Credential vendor hanya berada di backend.
+3. Setiap vendor memiliki adapter sendiri.
+4. Setelah raw data dinormalisasi, pipeline aplikasi dibuat seragam.
+5. Fast path selalu memiliki fallback bila upstream vendor berubah atau gagal.
+6. Optimasi Monitoring tidak boleh mengorbankan ketepatan Pengolahan.
 
 ---
 
-## Periode Pengolahan
+# Pengolahan Data
 
-Aplikasi mendukung empat mode periode:
-
-### Harian
-
-Memilih satu tanggal.
-
-### Bulanan
-
-Memilih bulan dan tahun.
-
-### Tahunan
-
-Memilih satu tahun.
-
-### Rentang Tanggal
-
-Memilih tanggal awal dan tanggal akhir.
-
-Komponen pemilih tanggal menggunakan tampilan yang disesuaikan dengan masing-masing mode agar pengalaman pengguna tetap konsisten.
-
----
-
-## Alur Pemrosesan
-
-Secara umum seluruh vendor masuk ke pipeline yang sama:
+Alur umum:
 
 ```text
-Pilih Jenis Data
-        ↓
 Pilih Logger
-        ↓
+    ↓
+Pilih Kategori Data
+    ↓
 Pilih Sumber Data
-(Server / Upload File)
-        ↓
+    ↓
 Pilih Pos
-        ↓
+    ↓
 Pilih Parameter
-        ↓
+    ↓
 Pilih Periode
-        ↓
-Ambil / Parse Raw Data
-        ↓
-Normalisasi Timestamp & Nilai
-        ↓
-Agregasi / Pemrosesan Jam-Jaman
-        ↓
-Faktor Koreksi (opsional)
-        ↓
-Ringkasan + Grafik + Preview
-        ↓
+    ↓
+Ambil / parse raw data
+    ↓
+Normalisasi timestamp + nilai
+    ↓
+Agregasi jam-jaman
+    ↓
+Faktor koreksi opsional
+    ↓
+Grafik + tabel + ringkasan
+    ↓
 Ekspor Excel
 ```
 
-Perbedaan antar-vendor hanya berada pada **adapter sumber data**. Setelah data berhasil dinormalisasi, UI/UX dan proses pengolahan menggunakan pipeline utama yang sama.
+Untuk Server Telemetri, cara pengambilan raw berbeda pada tiap vendor, tetapi hasilnya dikembalikan ke format yang konsisten sebelum diproses lebih lanjut.
+
+---
+
+# Monitoring Telemetri
+
+Monitoring dirancang untuk membaca banyak pos sekaligus. Karena bebannya jauh lebih berat daripada Pengolahan satu pos, jalur Monitoring memakai endpoint dan strategi yang lebih sesuai untuk dashboard.
+
+## Status Data
+
+Status dihitung dari view jam-jaman:
+
+| Status | Kondisi |
+|---|---|
+| **Berhasil** | gap kosong kontinyu terpanjang per hari `≤ 6 jam` |
+| **Peringatan** | gap kosong kontinyu `> 6` sampai `12 jam` |
+| **Terputus** | gap kosong kontinyu `> 12 jam` |
+| **Gagal** | request/parameter vendor gagal diambil |
+
+Catatan:
+
+- Nilai `0.0` dianggap data valid.
+- Curah Hujan memakai hari hidrologis 07:00–06:59.
+- Tinggi Muka Air memakai hari kalender.
+- Untuk periode berjalan, hanya slot sampai waktu efektif request yang diperiksa.
+
+## Diagnostik Performa
+
+Response Monitoring membawa informasi performa dan browser mencetak detail ke DevTools, antara lain:
+
+```text
+TOTAL request
+Metadata seluruh vendor
+Fase fetch vendor paralel
+Beacon total
+Beacon bulk /monitoring
+Beacon supplement exact
+Higertech
+Tatonas
+Dashindo
+Agregasi + bentuk tabel
+```
+
+Detail Beacon juga dapat menunjukkan ukuran chunk, jumlah worker, token cache, dan timing supplement. Diagnostik ini ditujukan untuk debugging dan tidak ditampilkan sebagai waktu proses pada UI utama.
 
 ---
 
 # Integrasi Vendor
 
+## Ringkasan Jalur Saat Ini
+
+| Vendor | Pengolahan | Monitoring | Fallback utama |
+|---|---|---|---|
+| **Beacon BBWS** | `set_sensordash → token → data_chunk` | bulk `/monitoring` + exact supplement | mekanisme token lama |
+| **Beacon PSDA** | halaman historis `/analisa/data/<token>` | bulk bila tersedia + supplement HTML | HTML historis |
+| **Tatonas** | API historis vendor | API historis dengan fast-fail/deadline | mekanisme request existing |
+| **Higertech** | `GetChartDataAwlrArr`, `minute`, raw 5-menit | endpoint chart `minute`, lalu agregasi sendiri | XLSX bulanan |
+| **Dashindo** | `get_n_data`, raw menit/sub-menit | `get_n_data_hourly` | `downloadcsv` |
+
 ## 1. Beacon / Monitoring4System
 
-Beacon merupakan salah satu sumber Server Telemetri utama.
+### Credential
 
-### Konfigurasi
-
-Environment Variables:
-
-```text
-BEACON_USERNAME
-BEACON_PASSWORD
+```env
+BEACON_USERNAME=
+BEACON_PASSWORD=
 ```
 
-Opsional:
+### Pengolahan Beacon BBWS
+
+Fast path saat ini:
 
 ```text
-BBWS_BASE_URL=https://bbwsso.monitoring4system.com
-BEACON_USERNAME_FIELD=username
-BEACON_PASSWORD_FIELD=password
-BBWS_TIMEOUT=45
-PARAMETER_CACHE_TTL=600
-MAX_QUERY_DAYS=25
+set_sensordash
+    ↓
+ambil token dari Location redirect
+    ↓
+data_chunk
+    ↓
+parse payload.data [epoch_ms, value]
+    ↓
+raw normalized rows
 ```
 
-### Mekanisme
+Ketentuan penting:
 
-Backend melakukan autentikasi ke server Beacon menggunakan credential yang disimpan di backend, kemudian:
+- Maksimal request historis Beacon tetap **25 hari per chunk**.
+- Chunk satu pos dapat dijalankan paralel secara konservatif.
+- Token sensor dapat di-cache singkat pada warm instance.
+- Bila fast selector gagal, backend kembali ke mekanisme token lama.
+- Parser canonical `payload.data` mencegah timestamp numerik berubah menjadi tanggal 1899/1900.
+
+### Pengolahan Beacon PSDA
+
+Aset PSDA/non-BBWS tidak menggunakan `data_chunk` karena upstream tidak mendukung jalur tersebut. Backend tetap mengambil halaman historis token dan mem-parsing tabel data.
+
+Untuk rentang panjang, aplikasi dapat membagi pekerjaan menjadi bagian yang lebih kecil sehingga tidak bergantung pada satu render halaman vendor yang sangat berat.
+
+### Monitoring Beacon
+
+Monitoring memakai strategi:
 
 ```text
-Login
-  ↓
-Ambil katalog pos/logger
-  ↓
-Ambil parameter
-  ↓
-Request data historis
-  ↓
-Normalisasi
-  ↓
-Pipeline aplikasi
+bulk /monitoring
+    ↓
+identifikasi pos yang sudah ter-cover
+    ↓
+exact supplement hanya untuk sensor yang belum ter-cover
 ```
 
-Credential **tidak dikirim ke frontend**.
+Kategori native yang dipakai antara lain:
 
-### Pengambilan Historis
+- AWLR untuk Tinggi Muka Air.
+- ARR untuk Curah Hujan.
 
-Untuk sumber yang menggunakan mekanisme chunking, konfigurasi utama adalah:
+Rentang panjang menggunakan bulk chunk dan session Beacon terisolasi karena `set_kategori` dan `set_tanggal` bersifat stateful per session.
 
-```text
-MAX_QUERY_DAYS=25
-```
-
-Nilai ini menentukan ukuran rentang maksimum per request historis dan dapat diubah melalui Environment Variable tanpa mengedit source code.
+Supplement BBWS memakai satu global `data_chunk` pool agar pekerjaan beberapa pos/rentang panjang lebih seimbang.
 
 ---
 
 ## 2. Tatonas
 
-Adapter Tatonas terintegrasi langsung ke backend tanpa membawa UI downloader lokal. UI/UX, pemrosesan jam-jaman, grafik, dan ekspor tetap menggunakan aplikasi utama.
+### Credential
 
-### Konfigurasi
-
-Nilai sumber saat ini:
-
-```text
-TATONAS_BASE_URL=https://tatonas.co.id
-TATONAS_PLANT=028
+```env
+TATONAS_USERNAME=
+TATONAS_PASSWORD=
 ```
 
-Credential:
+Sumber utama historis menggunakan endpoint Tatonas pada plant BBWS Serayu Opak.
 
-```text
-TATONAS_USERNAME
-TATONAS_PASSWORD
-```
+Pengolahan mempertahankan mekanisme historis yang sudah ada, termasuk pemecahan rentang dan retry sesuai adapter.
 
-### Metadata Sensor
+Monitoring memakai profil berbeda karena dashboard tidak boleh tertahan terlalu lama oleh satu vendor:
 
-Metadata parameter diambil dari katalog plant-level:
+- timeout lebih pendek;
+- retry default minimum;
+- deadline total vendor;
+- pos yang tidak selesai dapat ditandai gagal sementara vendor lain tetap ditampilkan.
 
-```text
-/admin/p/trs_local_mst_sensor_list2?plant=028
-```
-
-Backend mengikuti pola autentikasi Tatonas dengan:
-
-- session login;
-- CSRF token dari HTML;
-- XSRF token dari cookie;
-- metadata sensor yang kemudian di-cache.
-
-Daftar parameter tidak bergantung pada tersedia/tidaknya data pada satu tanggal tertentu.
-
-### Pos yang Teridentifikasi
-
-| Logger | Pos | Jenis |
-|---|---|---|
-| 4101 | Penungkulan | Curah Hujan |
-| 4102 | Kutoarjo | Curah Hujan |
-| 4104 | Sempor | Curah Hujan |
-| 4105 | Opak Bintaran | Tinggi Muka Air |
-| 4106 | Sermo | Curah Hujan / Klimatologi |
-
-### Profil Sensor
-
-**Penungkulan**
-- Rain
-- Device
-
-**Kutoarjo**
-- Rain
-- Device
-
-**Sempor**
-- Rain
-- Device
-
-**Opak Bintaran**
-- Water
-- Factory
-- Device
-
-**Sermo**
-- katalog klimatologi yang tersedia pada logger, termasuk hujan dan parameter meteorologi lainnya.
-
-### Parser Data
-
-Parser memprioritaskan:
-
-```text
-data_table[].date_act
-data_table[].sensor.<kd_sensor>.value
-```
-
-Struktur `data_graph` tetap didukung sebagai fallback kompatibilitas.
-
-Alias parameter hujan seperti:
-
-```text
-rainfall
-curahhujan
-```
-
-diperlakukan sebagai parameter hujan utama yang ekuivalen bila metadata dan payload menggunakan penamaan berbeda.
-
-### TMA Opak Bintaran
-
-Data TMA sumber Tatonas dipertahankan sesuai unit sumber pada adapter dan dikonversi oleh pipeline aplikasi agar tidak terjadi konversi ganda.
+Hal ini penting ketika server Tatonas sedang lambat atau tidak stabil.
 
 ---
 
 ## 3. Higertech
 
-Higertech diintegrasikan sebagai adapter Server tanpa mengubah UI/UX dan pipeline utama.
+### Credential
 
-### Konfigurasi
-
-```text
-HIGERTECH_USERNAME
-HIGERTECH_PASSWORD
+```env
+HIGERTECH_USERNAME=
+HIGERTECH_PASSWORD=
 ```
 
-Opsional:
+### Pengolahan
+
+Untuk rentang sampai default **62 hari**, jalur utama menggunakan:
 
 ```text
-HIGERTECH_BASE_URL=https://bbwsserayuopak.higertech.com
+POST /Station/GetChartDataAwlrArr
+selectedTime=minute
+filterDate=YYYY-MM-DD
 ```
 
-Credential Higertech sengaja **terpisah dari Beacon**.
+Satu request mengambil raw native **5-menit** untuk satu hari. Beberapa hari dapat dipanggil paralel, kemudian raw data digabung kronologis dan baru diagregasi oleh pipeline aplikasi.
 
-### Metadata Pos
+Field utama yang dipakai sesuai parameter antara lain:
 
-Backend menggunakan:
+- `waterLevel`
+- `rainfall`
+- timestamp `readingAt`
 
-```text
-POST /DownloadData/GetDatatableStation
-```
+Jika chart JSON gagal atau rentang melewati batas fast path, backend fallback ke export XLSX bulanan 5-menit.
 
-untuk membaca daftar stasiun/device.
+### Monitoring
 
-### Data Historis
+Monitoring memakai endpoint chart yang sama dengan resolusi `minute`, kemudian:
 
-Backend menggunakan:
+- TMA jam-jaman = agregasi titik 5-menit dalam jam.
+- Curah Hujan jam-jaman = agregasi titik 5-menit dalam jam.
+- Curah Hujan harian tetap mengikuti 07:00–06:59.
 
-```text
-POST /DownloadData/Export
-```
-
-dengan:
-
-```text
-selecedData=minute
-```
-
-sehingga data sumber yang diambil menggunakan resolusi **per 5 menit**.
-
-Untuk periode panjang:
-
-```text
-periode yang dipilih
-      ↓
-pecah berdasarkan bulan
-      ↓
-download export bulanan Higertech
-      ↓
-parse workbook
-      ↓
-gabungkan data
-      ↓
-filter sesuai periode pengguna
-      ↓
-pipeline aplikasi
-```
-
-### Parser Export 5 Menit
-
-Format export yang didukung antara lain:
-
-```text
-Tanggal
-Jam/Menit
-TMA
-Debit (m3/s)
-Curah Hujan (mm)
-```
-
-Parser memprioritaskan kolom:
-
-```text
-Jam/Menit
-```
-
-sebagai timestamp.
-
-Format nama bulan Indonesia dan waktu seperti:
-
-```text
-00.05
-```
-
-dinormalisasi menjadi timestamp yang dapat diproses aplikasi.
-
-Kolom utama dipetakan eksplisit:
-
-```text
-TMA              → Tinggi Muka Air
-Curah Hujan (mm) → Curah Hujan
-```
-
-Agregasi jam-jaman tetap dilakukan oleh pipeline aplikasi.
+Raw per hari memiliki cache warm-instance untuk mengurangi request berulang.
 
 ---
 
 ## 4. Dashindo / Scadash
 
-Integrasi Dashindo mengambil **algoritma sumber data** dari Dashindo Downloader Local v1.5.3. UI downloader lokal tidak dibawa ke repository.
+### Credential
 
-Server Dashindo yang telah diidentifikasi digunakan untuk **AWLR / Tinggi Muka Air**.
+```env
+DASHINDO_USERNAME=
+DASHINDO_PASSWORD=
+```
 
-### Konfigurasi
+Backend berkomunikasi dengan Engine.IO v4 / Socket.IO vendor.
+
+### Pengolahan
+
+Pengolahan memakai event raw:
 
 ```text
-DASHINDO_USERNAME
-DASHINDO_PASSWORD
+get_n_data(device, field, [tss, tse])
+    ↓
+n_data {times, values}
 ```
 
-Opsional:
+Data tetap **raw menit/sub-menit**, bukan hourly. Agregasi dilakukan sendiri oleh aplikasi.
+
+Jalur ini lebih ringan daripada:
 
 ```text
-DASHINDO_BASE_URL=http://202.180.30.82
-DASHINDO_SOCKET_URL=http://202.180.30.82:8000
-DASHINDO_WAIT_TIMEOUT=45
+downloadcsv
+→ Base64
+→ decode
+→ parse CSV
 ```
 
-### Login
+Jika direct raw gagal, `downloadcsv` tetap tersedia sebagai fallback.
 
-Alur login:
+### Monitoring
+
+Monitoring memakai:
 
 ```text
-GET halaman login
-      ↓
-ambil const token
-      ↓
-SHA-256 password
-      ↓
-POST /API/login.php
-      ↓
-PHPSESSID + scadash_user_token
+persistent Engine.IO
+→ get_n_data_hourly
+→ n_data
 ```
 
-### Metadata AWLR
-
-Metadata stasiun dibaca dari:
-
-```text
-/dashboard/API/get-mqtt-awlr.php
-```
-
-Endpoint membutuhkan session serta `Referer` yang sesuai.
-
-Mapping field menggunakan **ID Sensor**, bukan hanya ID Alat, karena satu alat dapat memiliki lebih dari satu field. Contoh:
-
-```text
-SOWL008 / ID 171 → tma
-SOWL008 / ID 172 → tma2
-```
-
-### Nama Mapping Pos
-
-Semua nama operator lintas vendor dikendalikan dari satu sumber:
-
-```text
-data/station_aliases.json
-```
-
-Kunci yang dipakai adalah `id_logger` (Beacon), `deviceId` (Higertech), `kd_hardware` (Tatonas), dan `id` sensor (Dashindo). Jika ID belum memiliki alias, aplikasi memakai nama asli vendor sebagai fallback. Dengan demikian perubahan seperti `Bintaran` menjadi `Opak Bintaran` cukup dilakukan di satu file dan tidak perlu menyentuh `api/core.py`.
-
-Dropdown menggunakan nama operator yang lebih ringkas.
-
-Urutannya:
-
-1. nama tanpa kata **Irigasi**, A–Z;
-2. nama dengan kata **Irigasi**, A–Z.
-
-Contoh:
-
-```text
-Bengkok
-Clereng
-Ngrancah 2
-Pekik Jamal
-Pengasih
-Safari
-Secang
-Sermo Outflow
-Sermo Waduk
-...
-Secang Irigasi
-```
-
-### Historis Dashindo
-
-Dashindo tidak menggunakan endpoint HTTP historis biasa. Backend mengikuti Engine.IO v4 menggunakan **manual HTTP long-polling**, tanpa `python-socketio` dan tanpa harus mempertahankan koneksi WebSocket.
-
-Alur:
-
-```text
-GET /socket.io/?EIO=4&transport=polling
-      ↓
-parse SID dari handshake
-      ↓
-POST packet 40
-      ↓
-event ehlo
-      ↓
-POST /dashboard/API/websocket-auth.php
-      ↓
-event auth
-      ↓
-emit downloadcsv
-      ↓
-event download_csv
-      ↓
-decode Base64 CSV
-      ↓
-parse _time + _value
-      ↓
-pipeline aplikasi
-```
-
-### Resolusi Sumber
-
-CSV historis yang diminta backend adalah **raw Dashindo sekitar 1 menit**, bukan sampling 5 menit.
-
-Contoh struktur sumber:
-
-```csv
-id,_field,_time,_value
-SOWL025,tma,2026-07-31 18:04:13,0.03
-```
-
-Data raw tersebut kemudian diteruskan ke pipeline aplikasi untuk pemrosesan berikutnya.
+Koneksi persisten dipakai per worker untuk mengurangi handshake/autentikasi berulang. CSV dipakai sebagai fallback bila hourly direct gagal.
 
 ---
 
+# Aturan Pengolahan Data
+
+## Curah Hujan
+
+Hari hidrologis:
+
+```text
+07:00 hari H
+sampai
+06:59 hari H+1
+```
+
+Contoh 1 Januari 2026:
+
+```text
+2026-01-01 07:00
+sampai
+2026-01-02 06:59
+```
+
+Nilai Curah Hujan pada UI dan export mengikuti format angka yang ditetapkan aplikasi. Monitoring juga menyediakan klasifikasi intensitas/harian.
+
+## Tinggi Muka Air
+
+Tinggi Muka Air ditampilkan dan diekspor dengan **dua angka desimal** (`0.00`). Grafik dan tooltip mengikuti format dua desimal.
+
 ## Faktor Koreksi
 
-Faktor koreksi bersifat opsional.
+Faktor koreksi bersifat opsional dan diterapkan pada pipeline Pengolahan setelah raw data berhasil dinormalisasi sesuai aturan parameter yang tersedia pada UI.
 
-### Curah Hujan
+## Periode
 
-Menggunakan faktor pengali:
-
-```text
-nilai_koreksi = nilai_asli × faktor
-```
-
-### Tinggi Muka Air
-
-Menggunakan koreksi dalam meter:
+Mode yang tersedia:
 
 ```text
-nilai_koreksi = nilai_asli + koreksi_meter
+Harian
+Bulanan
+Tahunan
+Rentang Tanggal
 ```
 
-Jika koreksi tidak diaktifkan, nilai asli tidak diubah.
+Tanggal output menggunakan format `yyyy-mm-dd`. Untuk periode bulanan/tahunan, tabel dan Excel mempertahankan tanggal yang termasuk dalam periode sampai batas tanggal yang valid/tersedia sesuai aturan aplikasi.
+
+---
+
+# UI Bersama
+
+Pengolahan dan Monitoring memakai komponen Jinja reusable pada:
+
+```text
+templates/components/ui.html
+```
+
+dan styling komponen pada:
+
+```text
+static/css/ui-components.css
+```
+
+Komponen utama:
+
+- `three_column_layout(...)`
+- `card(...)`
+- `card_header(...)`
+- `field(...)`
+- `stat_card(...)`
+- `status_card(...)`
+- `summary_table(...)`
+- `info_item(...)`
+
+`static/css/app.css` menyediakan semantic theme tokens light/dark, sedangkan `processing.css` dan `monitoring.css` menangani kebutuhan spesifik halaman.
+
+Layout desktop menggunakan tiga kolom fluid dengan breakpoint bersama dan menjadi satu kolom pada mobile.
 
 ---
 
@@ -591,292 +482,206 @@ Jika koreksi tidak diaktifkan, nilai asli tidak diubah.
 
 ## Persyaratan
 
-- Python 3.11+ disarankan
-- pip
-- koneksi internet untuk sumber Server Telemetri
+- Python **3.11+** disarankan.
+- Windows dapat memakai `run.bat`.
+- Koneksi internet diperlukan untuk akses vendor.
 
-Install dependency:
+## Cara Cepat Windows
 
-```bash
-python -m pip install -r requirements.txt
+1. Extract repository.
+2. Salin `.env.example` menjadi `.env`.
+3. Isi credential yang dibutuhkan.
+4. Jalankan:
+
+```text
+run.bat
 ```
 
-Jalankan aplikasi dari root repository:
-
-```bash
-python -m api.app
-```
-
-Kemudian buka:
+5. Buka:
 
 ```text
 http://127.0.0.1:5050
 ```
 
-Untuk Windows, Environment Variables dapat diset pada sistem, terminal, atau menggunakan konfigurasi lokal privat yang **tidak di-commit ke GitHub**.
+`run.bat` akan mencari Python, memuat `.env`, memastikan dependency terpasang, lalu menjalankan Flask.
 
----
+## Cara Manual
 
-# Struktur Backend
-
-Backend telah dipisahkan agar perubahan route tidak bercampur dengan adapter telemetri:
-
-```text
-api/
-├── app.py                 # entry point Flask / Vercel
-├── core.py                # adapter vendor, parser, cache, dan pengolahan inti
-├── routes/
-│   ├── auth.py            # autentikasi aplikasi + health
-│   ├── telemetry.py       # metadata dan API data vendor
-│   ├── monitoring.py      # halaman + endpoint Monitoring
-│   └── download.py        # export Excel Pengolahan
-└── services/
-    └── monitoring.py      # agregasi dan pengambilan Monitoring terpadu
+```bash
+python -m venv .venv
 ```
 
-`api/app.py` sengaja dibuat tipis agar entry point Vercel tetap sederhana. Adapter vendor belum diubah algoritmanya dalam refactor ini.
+Windows:
+
+```bash
+.venv\Scripts\activate
+pip install -r requirements.txt
+python api/app.py
+```
+
+Aplikasi berjalan pada:
+
+```text
+http://127.0.0.1:5050
+```
 
 ---
 
 # Environment Variables
 
-## Wajib untuk akses aplikasi
+Gunakan `.env.example` sebagai template local. Jangan commit `.env` asli.
 
-```text
-APP_PASSWORDS
-SESSION_SECRET
+## Akses Aplikasi
+
+```env
+APP_PASSWORDS=password_admin,password_operator,password_lapangan
+SESSION_SECRET=ganti_dengan_string_panjang_acak
 ```
 
-`APP_PASSWORDS` digunakan untuk melindungi fitur Server Telemetri dan dapat memuat beberapa password. Gunakan daftar dipisahkan koma, misalnya `APP_PASSWORDS=password_admin,password_operator,password_lapangan`. Format JSON array juga didukung.
-
-`SESSION_SECRET` sebaiknya berupa string panjang, acak, dan tidak dibagikan.
+`APP_PASSWORD` lama masih dapat dibaca sebagai fallback kompatibilitas, tetapi konfigurasi baru sebaiknya memakai `APP_PASSWORDS`.
 
 ## Beacon
 
-```text
-BEACON_USERNAME
-BEACON_PASSWORD
+```env
+BEACON_USERNAME=
+BEACON_PASSWORD=
+BEACON_USERNAME_FIELD=username
+BEACON_PASSWORD_FIELD=password
+BBWS_BASE_URL=https://bbwsso.monitoring4system.com
+BBWS_TIMEOUT=45
+PARAMETER_CACHE_TTL=21600
+BEACON_CHUNK_DAYS=25
+BEACON_PARALLEL_WORKERS=3
+BEACON_PROCESS_TOKEN_TTL=300
+```
+
+Monitoring Beacon opsional:
+
+```env
+MONITORING_BEACON_BULK_DAYS=7
+MONITORING_BEACON_BULK_WORKERS=3
+MONITORING_BEACON_BULK_LONG_THRESHOLD=15
+MONITORING_BEACON_BULK_LONG_DAYS=8
+MONITORING_BEACON_BULK_LONG_WORKERS=4
+MONITORING_BEACON_WORKERS=4
+MONITORING_BEACON_CHUNK_WORKERS=6
+MONITORING_BEACON_METADATA_TTL=21600
+MONITORING_BEACON_SESSION_TTL=900
+MONITORING_BEACON_TOKEN_TTL=300
 ```
 
 ## Tatonas
 
-```text
-TATONAS_USERNAME
-TATONAS_PASSWORD
+```env
+TATONAS_USERNAME=
+TATONAS_PASSWORD=
+TATONAS_CHUNK_MONTHS=3
+TATONAS_PARALLEL_WORKERS=2
+```
+
+Monitoring Tatonas opsional:
+
+```env
+MONITORING_TATONAS_WORKERS=4
+MONITORING_TATONAS_CONNECT_TIMEOUT=4
+MONITORING_TATONAS_TIMEOUT=12
+MONITORING_TATONAS_RETRIES=0
+MONITORING_TATONAS_VENDOR_DEADLINE=15
 ```
 
 ## Higertech
 
-```text
-HIGERTECH_USERNAME
-HIGERTECH_PASSWORD
+```env
+HIGERTECH_USERNAME=
+HIGERTECH_PASSWORD=
+HIGERTECH_BASE_URL=https://bbwsserayuopak.higertech.com
+HIGERTECH_CHART_DAY_WORKERS=8
+HIGERTECH_CHART_TIMEOUT=8
+HIGERTECH_CHART_MAX_DAYS=62
+HIGERTECH_CHART_CACHE_TTL=21600
+HIGERTECH_CHART_TODAY_CACHE_TTL=60
+HIGERTECH_CHART_CACHE_MAX=256
+HIGERTECH_PARALLEL_WORKERS=3
+HIGERTECH_EXPORT_CACHE_TTL=900
+HIGERTECH_EXPORT_CACHE_MAX=12
+HIGERTECH_CHUNK_MONTHS=1
+HIGERTECH_EXPORT_TIMEOUT=120
+```
+
+Monitoring Higertech opsional:
+
+```env
+MONITORING_HIGERTECH_DAY_WORKERS=4
+MONITORING_HIGERTECH_TIMEOUT=8
+MONITORING_HIGERTECH_DAY_CACHE_TTL=600
+MONITORING_HIGERTECH_TODAY_CACHE_TTL=60
 ```
 
 ## Dashindo
 
-```text
-DASHINDO_USERNAME
-DASHINDO_PASSWORD
-```
-
-## Konfigurasi Opsional
-
-```text
-BBWS_BASE_URL=https://bbwsso.monitoring4system.com
-
-BEACON_USERNAME_FIELD=username
-BEACON_PASSWORD_FIELD=password
-
-HIGERTECH_BASE_URL=https://bbwsserayuopak.higertech.com
-
+```env
+DASHINDO_USERNAME=
+DASHINDO_PASSWORD=
 DASHINDO_BASE_URL=http://202.180.30.82
 DASHINDO_SOCKET_URL=http://202.180.30.82:8000
 DASHINDO_WAIT_TIMEOUT=45
-
-BBWS_TIMEOUT=45
-PARAMETER_CACHE_TTL=600
-MAX_QUERY_DAYS=25
+DASHINDO_PARALLEL_WORKERS=3
+DASHINDO_CHUNK_MONTHS=3
+DASHINDO_DIRECT_RAW_ENABLED=1
 ```
 
-Tatonas saat ini menggunakan:
+Monitoring Dashindo opsional:
 
-```text
-TATONAS_BASE_URL=https://tatonas.co.id
-TATONAS_PLANT=028
+```env
+MONITORING_DASHINDO_WORKERS=6
+MONITORING_DASHINDO_CONNECT_TIMEOUT=4
+MONITORING_DASHINDO_READ_TIMEOUT=8
+MONITORING_DASHINDO_EVENT_TIMEOUT=8
+MONITORING_DASHINDO_VENDOR_DEADLINE=15
 ```
 
-yang sudah ditetapkan pada konfigurasi project.
+## Cache Monitoring
+
+```env
+MONITORING_CACHE_TTL=300
+```
+
+> Worker dapat dinaikkan saat debugging local, tetapi deployment production sebaiknya tetap mempertimbangkan kemampuan upstream vendor dan resource serverless.
 
 ---
 
-# Deploy GitHub + Vercel
+# Deploy GitHub dan Vercel
 
-## 1. Siapkan Repository GitHub
+## GitHub
 
-Upload seluruh isi repository hasil ZIP ini ke GitHub.
-
-Jangan commit:
+Commit hanya source code dan file contoh konfigurasi. Jangan commit:
 
 ```text
 .env
-.env.*
-credential asli
-password
-token
-session lokal
-.venv/
-venv/
-__pycache__/
-*.pyc
+credential
+cookie
+session
+HAR yang mengandung credential/token
+file debug sensitif
 ```
 
-File `.gitignore` sudah disediakan untuk membantu mencegah file lokal ikut ter-commit.
+## Vercel
 
-Repository dapat dibuat **Private** bila aplikasi hanya digunakan internal.
+Repository sudah memiliki `vercel.json`. Alur umum:
 
----
+1. Push repository ke GitHub.
+2. Import project ke Vercel.
+3. Tambahkan Environment Variables.
+4. Deploy.
+5. Uji vendor satu per satu dengan periode pendek terlebih dahulu.
+6. Setelah stabil, uji periode bulanan/rentang panjang.
 
-## 2. Import Repository ke Vercel
+### Catatan Serverless
 
-Di Vercel:
-
-```text
-Add New
-→ Project
-→ Import Git Repository
-```
-
-Pilih repository ini.
-
-Gunakan root repository sebagai:
-
-```text
-Root Directory
-```
-
-Project menggunakan Flask/Python melalui:
-
-```text
-api/app.py
-```
-
-dan routing dikendalikan oleh:
-
-```text
-vercel.json
-```
-
----
-
-## 3. Tambahkan Environment Variables
-
-Masuk ke:
-
-```text
-Project
-→ Settings
-→ Environment Variables
-```
-
-Tambahkan minimal credential vendor yang akan digunakan.
-
-Untuk seluruh integrasi:
-
-```text
-BEACON_USERNAME
-BEACON_PASSWORD
-
-TATONAS_USERNAME
-TATONAS_PASSWORD
-
-HIGERTECH_USERNAME
-HIGERTECH_PASSWORD
-
-DASHINDO_USERNAME
-DASHINDO_PASSWORD
-
-APP_PASSWORDS
-SESSION_SECRET
-```
-
-Set Environment Variable untuk environment yang diperlukan:
-
-```text
-Production
-Preview
-Development
-```
-
-sesuai kebutuhan deployment.
-
-Setelah mengubah Environment Variables, lakukan **Redeploy**.
-
----
-
-## 4. Vercel Function Duration
-
-`vercel.json` pada repository mengatur:
-
-```json
-{
-  "functions": {
-    "api/app.py": {
-      "maxDuration": 60
-    }
-  }
-}
-```
-
-Dashindo menggunakan:
-
-```text
-DASHINDO_WAIT_TIMEOUT=45
-```
-
-secara default agar proses polling memiliki guard timeout yang lebih kecil dari konfigurasi function repository.
-
-Higertech dapat membutuhkan waktu lebih lama untuk periode panjang karena backend mengambil export per bulan dengan resolusi 5 menit.
-
----
-
-## 5. Catatan Koneksi Dashindo di Vercel
-
-Dashindo menggunakan koneksi HTTP keluar ke:
-
-```text
-DASHINDO_BASE_URL
-DASHINDO_SOCKET_URL
-```
-
-dengan Engine.IO v4 HTTP long-polling ke port `8000`.
-
-Deployment harus dapat melakukan outbound HTTP ke server Dashindo tersebut.
-
-Jika Dashindo dapat berjalan lokal tetapi gagal hanya di Vercel, periksa:
-
-- akses outbound ke host Dashindo;
-- akses port `8000`;
-- timeout function;
-- respons handshake Engine.IO;
-- log function Vercel.
-
----
-
-## 6. Verifikasi Setelah Deploy
-
-Setelah deployment selesai:
-
-1. Buka URL production Vercel.
-2. Masukkan password Server Telemetri.
-3. Uji satu vendor terlebih dahulu.
-4. Pastikan daftar pos berhasil dimuat.
-5. Pastikan parameter muncul.
-6. Gunakan periode pendek untuk pengujian awal.
-7. Jalankan **Proses Data**.
-8. Periksa preview, grafik, dan hasil Excel.
-9. Ulangi untuk vendor lainnya.
-
-Disarankan menguji vendor dengan periode pendek terlebih dahulu sebelum melakukan request bulanan atau tahunan.
+- Cache memory dan `/tmp` pada Vercel bersifat **best effort** dan dapat hilang saat instance baru dibuat.
+- Cold start dapat lebih lambat daripada warm instance.
+- Request upstream yang lama tetap harus memiliki timeout/deadline internal sebelum platform memutus function.
+- Dashindo menggunakan komunikasi Engine.IO/Socket.IO melalui backend; jalur Monitoring sudah dibuat persistent per worker untuk mengurangi overhead.
 
 ---
 
@@ -895,209 +700,150 @@ Disarankan menguji vendor dengan periode pendek terlebih dahulu sebelum melakuka
 │   └── services/
 │       └── monitoring.py
 ├── templates/
-│   ├── base.html                         # header/navbar/footer bersama
-│   ├── index.html                        # Olah Data Jam-Jaman
-│   └── monitoring.html                   # Monitoring Telemetri Terpadu
+│   ├── components/
+│   │   └── ui.html
+│   ├── base.html
+│   ├── index.html
+│   └── monitoring.html
 ├── static/
 │   ├── css/
-│   │   └── app.css                       # style bersama berbasis UI Olah Data
+│   │   ├── app.css
+│   │   ├── ui-components.css
+│   │   ├── processing.css
+│   │   └── monitoring.css
 │   └── js/
-│       ├── common.js                     # theme + helper UI bersama
-│       ├── index.js                      # logika halaman Olah Data
-│       └── monitoring.js                 # logika halaman Monitoring
+│       ├── common.js
+│       ├── index.js
+│       └── monitoring.js
 ├── data/
-│   ├── station_aliases.json              # override nama pos seluruh vendor
+│   ├── station_aliases.json
 │   ├── beacon/
-│   │   ├── positions.json
-│   │   └── parameter_catalog.json
 │   ├── higertech/
-│   │   ├── positions.json
-│   │   └── parameter_catalog.json
 │   ├── tatonas/
-│   │   ├── positions.json
-│   │   └── parameter_catalog.json
 │   └── dashindo/
-│       ├── positions.json
-│       └── parameter_catalog.json
 ├── config.py
 ├── requirements.txt
-├── vercel.json
 ├── run.bat
-├── .gitignore
-├── .vercelignore
+├── vercel.json
+├── .env.example
 └── README.md
 ```
 
-Seluruh dokumentasi integrasi vendor dan deployment telah digabungkan ke file `README.md` ini agar repository GitHub cukup memiliki satu dokumentasi utama.
+Seluruh dokumentasi utama, UI, integrasi vendor, deployment, dan riwayat versi sekarang dipusatkan di **satu `README.md`**.
 
 ---
 
-# Keamanan
+# Keamanan dan Operasional
 
-Credential seluruh vendor harus berada di backend.
+## Credential
 
-Jangan pernah memasukkan credential asli ke:
+Credential seluruh vendor wajib berada di backend. Jangan menaruh credential asli pada:
 
 - HTML
 - JavaScript frontend
 - README
 - repository GitHub
 - screenshot publik
-- file contoh yang ikut di-commit
-
-Gunakan Environment Variables pada Vercel.
-
-Prinsip lain:
-
-- gunakan `SESSION_SECRET` acak;
-- gunakan beberapa nilai `APP_PASSWORDS` yang kuat dan berbeda untuk pengguna/kelompok akses;
-- jangan log password/token;
-- validasi input periode;
-- batasi file upload;
-- jangan mengekspos cookie/session vendor ke frontend;
-- hindari menampilkan raw error yang mengandung secret.
-
----
-
-# Catatan Operasional
+- file contoh yang di-commit
 
 ## Cache
 
-Metadata tertentu menggunakan cache untuk mengurangi request berulang dan mempercepat pengalaman pengguna.
+Cache digunakan untuk mengurangi request vendor berulang, antara lain:
 
-Contoh konfigurasi:
+- metadata pos/parameter;
+- token Beacon tertentu;
+- raw Higertech per hari;
+- hasil Monitoring;
+- cache sesi browser untuk pilihan/hasil tertentu.
 
-```text
-PARAMETER_CACHE_TTL=600
-```
-
-Cache pada deployment serverless bersifat **best effort** karena instance Vercel dapat dibuat ulang sewaktu-waktu.
-
-## Periode Panjang
-
-Periode tahunan atau rentang panjang dapat memerlukan banyak request ke server vendor.
-
-Karakteristik sumber:
-
-| Vendor | Sumber Historis | Resolusi Sumber yang Digunakan |
-|---|---|---|
-| Beacon | API historis | mengikuti sumber/API |
-| Tatonas | telemetry response | mengikuti response logger |
-| Higertech | export Excel bulanan | 5 menit |
-| Dashindo | CSV `downloadcsv` | raw sekitar 1 menit |
+Pada Vercel, cache runtime tidak boleh dianggap permanen.
 
 ## Validasi Data
 
-Data telemetry dapat memiliki:
+Data telemetry dapat mengandung:
 
 - gap;
-- timestamp tidak kontinu;
 - duplicate;
 - perubahan interval;
+- timestamp tidak kontinu;
 - nilai kosong;
-- gangguan komunikasi alat.
+- gangguan komunikasi alat;
+- perbedaan unit atau penamaan parameter antar-vendor.
 
-Jumlah record yang lebih sedikit dari perkiraan tidak selalu berarti parser gagal. Selalu cocokkan hasil dengan sumber bila digunakan untuk pekerjaan resmi.
+Jumlah record yang berbeda dari perkiraan tidak selalu berarti parser gagal. Untuk penggunaan resmi, hasil tetap perlu dibandingkan dengan sumber dan prosedur QC.
+
+## Periode Panjang
+
+Aplikasi sengaja memecah beberapa request historis menjadi chunk agar lebih stabil daripada meminta seluruh periode dalam satu response vendor yang besar.
+
+Contoh strategi:
+
+```text
+Beacon     maksimal 25 hari/chunk untuk data_chunk
+Tatonas    chunk kalender sesuai konfigurasi
+Higertech  raw 5-menit harian pada fast path
+Dashindo   range raw melalui Engine.IO dengan fallback CSV
+```
 
 ---
 
-## Optimasi Request / Paralel (versi ini)
+# Riwayat Versi
 
-Optimasi yang diterapkan:
+Penomoran di bawah adalah penomoran repository baru. Kolom **Legacy** menghubungkan versi baru dengan arsip/migration label lama agar riwayat debugging tetap dapat ditelusuri.
 
-- metadata `positions.json` dan `parameter_catalog.json` tersedia untuk Beacon, Higertech, Tatonas, dan Dashindo; pada local metadata hasil refresh ditulis kembali ke folder `data/<vendor>/`, sedangkan Vercel menggunakan repo sebagai seed dan `/tmp` sebagai cache runtime;
-- cache metadata browser tetap digunakan untuk mengurangi request berulang;
-- **Beacon** maksimal 25 hari per bagian request. Aset `*_bbws` memakai endpoint cepat `/analisa/data_chunk`, sedangkan aset non-BBWS/`*_psda` memakai kembali tabel HTML `/analisa/data/...` karena endpoint chunk upstream memang menolak aset non-BBWS; retry bagian lebih kecil tetap diterapkan bila upstream bermasalah;
-- **Tatonas** dan **Dashindo** default maksimal 3 bulan kalender per bagian request dan akan diperkecil lagi jika terdeteksi timeout;
-- **Higertech** mempertahankan mekanisme export bulanan bawaan dan cache export yang sudah ada;
-- request monitoring dijalankan paralel antar-vendor; request antar-pos non-Beacon juga paralel secara konservatif;
-- progress pengambilan data pada halaman Olah Data mengikuti jumlah bagian request yang benar-benar selesai;
-- periode Bulanan/Tahunan mempertahankan seluruh tanggal periode pada tabel/Excel walaupun awal atau akhir periode kosong.
+| Versi | Legacy | Ringkasan perubahan |
+|---|---|---|
+| **0.0.1** | awal | Versi pertama. Hanya dapat mengolah data dari file manual; belum ada Server Telemetri, Monitoring terpadu, atau integrasi vendor. |
+| **0.1.0** | fase awal | Mulai menambahkan sumber Server Telemetri dan adapter vendor pertama, sementara upload manual tetap dipertahankan. |
+| **0.2.0** | fase awal | Fondasi integrasi multi-vendor Beacon, Higertech, Tatonas, dan Dashindo serta normalisasi data ke pipeline Pengolahan yang sama. |
+| **0.3.0** | fase awal | Perapihan UI Pengolahan, mode periode, grafik, tabel, Excel, metadata/cache, serta kesiapan local → GitHub/Vercel. |
+| **1.0.0** | V6–V11 | Masuk lini **Pre-QC 1.x**. Backend dimodularisasi, multi-password, metadata/cache vendor, alias nama pos terpusat, cache sesi, Monitoring dasar, klasifikasi/status, dan konsistensi UI/format TMA dua desimal. |
+| **1.1.0** | V13–V16 | Monitoring Beacon memakai **bulk + exact supplement**, diagnostik performa ditambahkan, Tatonas Monitoring mendapat fast-fail, dan filter multi-select Logger memungkinkan vendor yang tidak dipilih tidak di-request. |
+| **1.2.0** | V17–V18 | Optimasi Monitoring periode pendek Beacon, UI Monitoring diringkas, cache session/login Beacon diperkuat, dan Tatonas mendapat **vendor deadline** agar tidak menahan vendor lain. |
+| **1.2.1** | V20 | Eksperimen bulk+supplement paralel dari V19 dibatalkan karena lebih lambat. Kembali ke bulk lalu supplement dan menambahkan cache token Beacon supplement yang fail-safe. |
+| **1.3.0** | V21 | Monitoring Dashindo memakai **persistent Engine.IO per worker**, sehingga handshake dan autentikasi tidak lagi diulang untuk setiap pos. |
+| **1.3.1** | V22 | Monitoring Dashindo berpindah ke `get_n_data_hourly → n_data`; Base64/CSV hanya fallback. |
+| **1.4.0** | V23 | Monitoring Higertech berpindah dari XLSX ke `GetChartDataAwlrArr` `selectedTime=minute`, tetap raw 5-menit lalu diagregasi sendiri. |
+| **1.5.0** | V24 | Optimasi Beacon rentang panjang: bulk chunk adaptif, fast token `set_sensordash` tanpa render HTML, serta perbaikan scope timer metadata. |
+| **1.5.1** | V25 | Supplement Beacon BBWS di-flatten ke satu global `data_chunk` pool; warning Lucide `calendar-month` diperbaiki menjadi ikon valid `calendar-days`. |
+| **1.6.0** | V26 | Pengolahan ikut memakai fast raw path: Beacon BBWS `set_sensordash + data_chunk`, Higertech chart JSON raw 5-menit, dan Dashindo `get_n_data` raw menit/sub-menit. Semua tetap memiliki fallback. |
+| **1.6.0.1** | V26.1 | **Hotfix kecil** parser timestamp Beacon BBWS: canonical `payload.data [epoch_ms, value]` dipakai agar tanggal tidak berubah menjadi 1899/1900. **Versi saat ini.** |
 
-Environment variable opsional untuk tuning:
+### Catatan Arsip Legacy
 
-```text
-BEACON_CHUNK_DAYS=25
-BEACON_PARALLEL_WORKERS=3
-TATONAS_CHUNK_MONTHS=3
-TATONAS_PARALLEL_WORKERS=2
-HIGERTECH_CHUNK_MONTHS=1
-HIGERTECH_PARALLEL_WORKERS=3
-HIGERTECH_EXPORT_TIMEOUT=120
-HIGERTECH_EXPORT_CACHE_TTL=900
-HIGERTECH_EXPORT_CACHE_MAX=12
-DASHINDO_CHUNK_MONTHS=3
-DASHINDO_PARALLEL_WORKERS=3
-MONITORING_CACHE_TTL=300
-MONITORING_BEACON_WORKERS=3
-```
+- Label lama tidak selalu membentuk release formal; sebagian merupakan iterasi eksperimen/debug.
+- `V19` merupakan eksperimen parallel bulk + supplement dan **tidak dipertahankan** karena benchmark lebih lambat.
+- Beberapa nomor legacy tidak memiliki file migration tersendiri. Riwayat baru di atas mengelompokkan perubahan berdasarkan milestone fitur, bukan sekadar nomor eksperimen.
+- Mulai versi ini, riwayat perubahan baru sebaiknya langsung ditambahkan ke tabel ini dan tidak lagi membuat banyak file `MIGRATION_V*.md` terpisah.
 
-`BEACON_CHUNK_DAYS` tetap di-clamp maksimal **25 hari** oleh aplikasi. `MAX_QUERY_DAYS` masih diterima sebagai fallback kompatibilitas untuk konfigurasi lama.
+---
 
-# Pengembangan
+# Rencana Pengembangan
 
-Beberapa pengembangan berikutnya yang memungkinkan:
+Fokus berikutnya sebelum QC formal dapat mencakup:
 
 - quality control missing/duplicate/outlier;
-- cache historis;
-- optimasi request periode panjang;
-- monitoring kesehatan tiap integrasi vendor;
-- logging diagnostik yang lebih terstruktur;
+- validasi konsistensi timestamp dan unit antar-vendor;
+- cache historis yang lebih permanen;
+- optimasi periode panjang tanpa membebani server vendor;
+- health check integrasi vendor;
+- logging diagnostik terstruktur;
 - penyimpanan dataset historis;
-- integrasi spreadsheet otomatis;
-- integrasi sumber telemetry tambahan.
+- auto-input Google Spreadsheet;
+- integrasi sumber telemetry tambahan;
+- pengujian QC terstruktur sebelum menaikkan major version dari `1.x.x`.
 
 ---
 
-## Status
-
-Repository ini merupakan aplikasi pengolah data hidrologi terpadu dengan dukungan:
+## Status Proyek
 
 ```text
-Beacon
-Tatonas
-Higertech
-Dashindo
-Upload Excel/CSV Manual
+Versi      : 1.6.0.1
+Tahap       : Pre-QC
+Backend     : Flask
+Deployment  : Local / GitHub / Vercel
+Vendor      : Beacon, Tatonas, Higertech, Dashindo
+Input lain  : Excel/CSV manual
 ```
 
-Seluruh vendor menggunakan satu UI/UX dan satu pipeline pengolahan utama, sementara perbedaan protokol sumber ditangani oleh adapter backend masing-masing.
-
----
-
-## Optimasi Request & Monitoring Terpadu (update Agustus 2026)
-
-Versi ini menambahkan peningkatan reliabilitas/performa tanpa mengganti pipeline olah jam-jaman yang sudah ada:
-
-- **Beacon**: maksimal 25 hari per request data; label `Bendung` disembunyikan dari nama pos, sedangkan `Bendungan` tetap dipertahankan.
-- **Tatonas**: maksimal 3 bulan kalender per request, retry otomatis pada timeout, serta sensor valid tidak dianggap hilang hanya karena satu sub-periode kosong.
-- **Higertech**: export bulanan tetap digunakan; nama stasiun uppercase dinormalisasi ke title case (contoh `KRANGGAN` menjadi `Kranggan`).
-- **Dashindo**: maksimal 3 bulan kalender per request dan timestamp sumber tetap dikonversi UTC → WIB sesuai adapter sebelumnya.
-- Metadata semua vendor memiliki seed/cache JSON persisten (`positions.json` + `parameter_catalog.json`).
-- Progress **Mengambil data dari server** menjadi determinate berdasarkan bagian request yang selesai.
-- Ringkasan grafik memakai **Data Terakhir, Tertinggi, Terendah**, plus **Akumulasi** untuk hujan atau **Rerata** untuk parameter lain; judul grafik juga memuat nama pos.
-- Bulanan dan tahunan selalu menampilkan seluruh tanggal periode yang dipilih, termasuk tanggal kosong pada awal/akhir rentang; ekspor Excel mengikuti tabel.
-- Pratinjau hasil tidak lagi dibatasi 15 baris.
-- Halaman **Monitoring** memakai style/navigasi yang sama dengan Olah Data, mendukung Bootstrap datepicker, Harian/Bulanan/Tahunan/Rentang Tanggal, Jam-jaman/Harian, orientasi Horizontal/Vertikal, serta ekspor Excel.
-- Header monitoring jam-jaman horizontal menggunakan dua lapis: **tanggal** lalu **jam**.
-- Monitoring memprioritaskan kanal hujan nomor 2 (mis. `Curah Hujan 2` / `Precipitation Intensity 2`) bila tersedia; bila hanya satu kanal, kanal itu dipakai.
-- Monitoring menjalankan vendor secara paralel agar durasi total mendekati vendor paling lambat, bukan penjumlahan semua vendor.
-
-Environment Variable performa opsional:
-
-```text
-PARAMETER_CACHE_TTL=21600
-BEACON_CHUNK_DAYS=25
-BEACON_PARALLEL_WORKERS=3
-TATONAS_CHUNK_MONTHS=3
-TATONAS_PARALLEL_WORKERS=2
-HIGERTECH_CHUNK_MONTHS=1
-HIGERTECH_PARALLEL_WORKERS=3
-HIGERTECH_EXPORT_TIMEOUT=120
-DASHINDO_CHUNK_MONTHS=3
-DASHINDO_PARALLEL_WORKERS=3
-MONITORING_CACHE_TTL=300
-MONITORING_BEACON_WORKERS=3
-```
-
-> `BEACON_CHUNK_DAYS` selalu dibatasi maksimal 25 hari. `MAX_QUERY_DAYS` tetap didukung sebagai fallback konfigurasi lama.
+Arah pengembangan tetap menjaga satu prinsip: **vendor boleh berbeda, tetapi pengalaman pengguna dan pipeline data aplikasi harus tetap satu dan sederhana.**

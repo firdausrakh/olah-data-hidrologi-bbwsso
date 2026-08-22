@@ -16,6 +16,25 @@
             {{ card_header('Filter Monitoring', 'Atur jenis data dan periode pemantauan', 'list-filter', 'box', 'h2') }}
 
             <div class="monitor-form-stack">
+                {% call field('Logger', 'loggerFilterButton', 'Pilih sumber logger yang akan dimuat. Logger yang tidak dicentang tidak akan diminta ke server, sehingga vendor yang sedang bermasalah dapat dilewati.', 'monitor-field') %}
+                    <div class="monitor-logger-filter" id="loggerFilter">
+                        <button class="monitor-logger-trigger" id="loggerFilterButton" type="button" aria-haspopup="true" aria-expanded="false">
+                            <span id="loggerFilterLabel">Semua Logger</span>
+                            <i data-lucide="chevron-down"></i>
+                        </button>
+                        <div class="monitor-logger-menu" id="loggerFilterMenu" hidden>
+                            <label class="monitor-logger-option monitor-logger-option--all">
+                                <input type="checkbox" id="loggerSelectAll" checked>
+                                <span>Semua Logger</span>
+                            </label>
+                            <div class="monitor-logger-divider"></div>
+                            <label class="monitor-logger-option"><input type="checkbox" class="logger-vendor-checkbox" value="beacon" checked><span>Beacon</span></label>
+                            <label class="monitor-logger-option"><input type="checkbox" class="logger-vendor-checkbox" value="tatonas" checked><span>Tatonas</span></label>
+                            <label class="monitor-logger-option"><input type="checkbox" class="logger-vendor-checkbox" value="higertech" checked><span>Higertech</span></label>
+                            <label class="monitor-logger-option"><input type="checkbox" class="logger-vendor-checkbox" value="dashindo" checked><span>Dashindo</span></label>
+                        </div>
+                    </div>
+                {% endcall %}
                 {% call field('Kategori Data', 'category', 'Pilih Curah Hujan atau Tinggi Muka Air. Pilihan awal dikosongkan agar data hanya dimuat saat Anda meminta.', 'monitor-field') %}
                     <select id="category"><option value="" selected>Pilih Kategori</option><option value="rain">Curah Hujan</option><option value="tma">Tinggi Muka Air</option></select>
                 {% endcall %}
@@ -33,7 +52,7 @@
                 </div>
                 <div class="period-detail one" hidden id="monthFields">
                     {% call field('Bulan', 'monthDate', 'Pilih satu bulan. Bulan berjalan otomatis dibatasi pada waktu saat ini.', 'monitor-field') %}
-                        <div class="monitor-date-wrap"><input autocomplete="off" id="monthDate" readonly inputmode="none"/><i data-lucide="calendar-month"></i></div>
+                        <div class="monitor-date-wrap"><input autocomplete="off" id="monthDate" readonly inputmode="none"/><i data-lucide="calendar-days"></i></div>
                     {% endcall %}
                 </div>
                 <div class="period-detail one" hidden id="yearFields">
@@ -55,7 +74,7 @@
                     <button class="btn monitor-download-btn" disabled id="downloadBtn"><i data-lucide="file-down"></i>Unduh Excel</button>
                 </div>
                 <div class="loading-box" id="loading">
-                    <div class="loading-head"><span>Mengambil data seluruh logger...</span><span>Mohon tunggu</span></div>
+                    <div class="loading-head"><span>Mengambil data logger terpilih...</span><span>Mohon tunggu</span></div>
                     <div class="loading-track"><div class="loading-bar"></div></div>
                 </div>
             </div>
@@ -64,7 +83,7 @@
         {% call card(classes='monitor-info-card ui-card--compact') %}
             <div class="monitor-info-heading"><i data-lucide="info"></i><strong>Informasi</strong></div>
             <div class="ui-info-list">
-                {{ info_item('radio-tower', 'Monitoring menggabungkan data seluruh logger yang tersedia.') }}
+                {{ info_item('radio-tower', 'Monitoring hanya meminta data dari logger/vendor yang dicentang pada filter.') }}
                 {{ info_item('shield-check', 'Gangguan pada satu pos tidak menghentikan data pos lainnya.') }}
                 {{ info_item('calendar-check-2', 'Rentang data otomatis berhenti pada waktu saat ini.') }}
             </div>
@@ -129,7 +148,7 @@
                     <div><dt>Kategori</dt><dd id="summaryMonitorCategory">Pilih Kategori</dd></div>
                     <div><dt>Tipe Data</dt><dd id="summaryMonitorResolution">Jam-Jaman</dd></div>
                     <div><dt>Periode</dt><dd id="summaryMonitorPeriodMode">Rentang Tanggal</dd></div>
-                    <div><dt>Logger</dt><dd>Semua</dd></div>
+                    <div><dt>Logger</dt><dd id="summaryMonitorLogger">Semua Logger</dd></div>
                 </dl>
             </div>
 

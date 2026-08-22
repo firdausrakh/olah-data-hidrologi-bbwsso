@@ -1,5 +1,11 @@
 const category = document.getElementById('category');
 const resolution = document.getElementById('resolution');
+const loggerFilter = document.getElementById('loggerFilter');
+const loggerFilterButton = document.getElementById('loggerFilterButton');
+const loggerFilterMenu = document.getElementById('loggerFilterMenu');
+const loggerFilterLabel = document.getElementById('loggerFilterLabel');
+const loggerSelectAll = document.getElementById('loggerSelectAll');
+const loggerVendorCheckboxes = [...document.querySelectorAll('.logger-vendor-checkbox')];
 const periodMode = document.getElementById('periodMode');
 const dailyDate = document.getElementById('dailyDate');
 const monthDate = document.getElementById('monthDate');
@@ -20,6 +26,7 @@ const periodMetric = document.getElementById('periodMetric');
 const summaryMonitorCategory = document.getElementById('summaryMonitorCategory');
 const summaryMonitorResolution = document.getElementById('summaryMonitorResolution');
 const summaryMonitorPeriodMode = document.getElementById('summaryMonitorPeriodMode');
+const summaryMonitorLogger = document.getElementById('summaryMonitorLogger');
 const monitorHydrologyInfo = document.getElementById('monitorHydrologyInfo');
 const hourlyPeakBody = document.getElementById('hourlyPeakBody');
 const dailyPeakBody = document.getElementById('dailyPeakBody');
@@ -51,6 +58,37 @@ function readMonitoringState() {
     const value = readSessionJson(MONITORING_STATE_KEY);
     return value && typeof value === 'object' ? value : null;
 }
+const LOGGER_VENDOR_LABELS = {beacon: 'Beacon', tatonas: 'Tatonas', higertech: 'Higertech', dashindo: 'Dashindo'};
+function selectedLoggerVendors() {
+    return loggerVendorCheckboxes.filter(el => el.checked).map(el => el.value);
+}
+function loggerVendorSignature(vendors = selectedLoggerVendors()) {
+    return [...vendors].sort().join(',');
+}
+function syncLoggerFilterUI() {
+    const selected = selectedLoggerVendors();
+    const allSelected = loggerVendorCheckboxes.length > 0 && selected.length === loggerVendorCheckboxes.length;
+    if (loggerSelectAll) {
+        loggerSelectAll.checked = allSelected;
+        loggerSelectAll.indeterminate = selected.length > 0 && !allSelected;
+    }
+    const names = selected.map(v => LOGGER_VENDOR_LABELS[v] || v);
+    if (loggerFilterLabel) {
+        loggerFilterLabel.textContent = allSelected ? 'Semua Logger'
+            : selected.length === 0 ? 'Pilih Logger'
+                : selected.length <= 2 ? names.join(', ')
+                    : `${selected.length} Logger`;
+    }
+    if (summaryMonitorLogger) {
+        summaryMonitorLogger.textContent = allSelected ? 'Semua Logger' : (names.join(', ') || 'Belum dipilih');
+    }
+    if (showBtn) showBtn.disabled = !category.value || selected.length === 0;
+}
+function setLoggerMenuOpen(open) {
+    if (!loggerFilterMenu || !loggerFilterButton) return;
+    loggerFilterMenu.hidden = !open;
+    loggerFilterButton.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
 function saveMonitoringState() {
     const state = {
         category: category.value || '',
@@ -61,18 +99,19 @@ function saveMonitoringState() {
         yearDate: yearDate.value || '',
         dateFrom: dateFrom.value || '',
         dateTo: dateTo.value || '',
+        vendors: selectedLoggerVendors(),
         orientation,
     };
     writeSessionJson(MONITORING_STATE_KEY, state);
 }
-function monitoringBundleKey(categoryValue, range) {
-    return `${categoryValue}|${range?.[0] || ''}|${range?.[1] || ''}`;
+function monitoringBundleKey(categoryValue, range, vendors = selectedLoggerVendors()) {
+    return `${categoryValue}|${range?.[0] || ''}|${range?.[1] || ''}|${loggerVendorSignature(vendors)}`;
 }
 function cacheMonitoringBundle(bundle) {
     if (!bundle?.category || !bundle?.date_from || !bundle?.date_to) return;
     const cache = readSessionJson(MONITORING_BUNDLE_CACHE_KEY) || {entries: {}};
     cache.entries = cache.entries && typeof cache.entries === 'object' ? cache.entries : {};
-    const key = monitoringBundleKey(bundle.category, [bundle.date_from, bundle.date_to]);
+    const key = monitoringBundleKey(bundle.category, [bundle.date_from, bundle.date_to], bundle.selected_vendors || selectedLoggerVendors());
     cache.entries[key] = {at: Date.now(), data: bundle};
     const ordered = Object.entries(cache.entries).sort((a, b) => (b[1]?.at || 0) - (a[1]?.at || 0));
     cache.entries = Object.fromEntries(ordered.slice(0, MONITORING_BUNDLE_CACHE_LIMIT));
@@ -84,7 +123,7 @@ function cacheMonitoringBundle(bundle) {
 function getCachedMonitoringBundle(categoryValue, range) {
     if (!categoryValue || !range) return null;
     const cache = readSessionJson(MONITORING_BUNDLE_CACHE_KEY);
-    return cache?.entries?.[monitoringBundleKey(categoryValue, range)]?.data || null;
+    return cache?.entries?.[monitoringBundleKey(categoryValue, range, selectedLoggerVendors())]?.data || null;
 }
 function dropCategoryPlaceholder() {
     const placeholder = category.querySelector('option[value=""]');
@@ -276,6 +315,7 @@ function syncMonitoringSummary() {
     if (summaryMonitorCategory) summaryMonitorCategory.textContent = categoryLabels[category.value] || category.value;
     if (summaryMonitorResolution) summaryMonitorResolution.textContent = resolutionLabels[resolution.value] || resolution.value;
     if (summaryMonitorPeriodMode) summaryMonitorPeriodMode.textContent = periodLabels[periodMode.value] || periodMode.value;
+    syncLoggerFilterUI();
     if (monitorHydrologyInfo) {
         monitorHydrologyInfo.textContent = category.value === 'rain'
             ? 'Curah hujan mengikuti hari hidrologis pukul 07:00–06:59 WIB pada pengolahan harian.'
@@ -285,7 +325,7 @@ function syncMonitoringSummary() {
     }
     if (rainClassificationLegend) rainClassificationLegend.hidden = category.value !== 'rain';
     if (monitorPeakSummary) monitorPeakSummary.hidden = category.value !== 'rain';
-    if (showBtn) showBtn.disabled = !category.value;
+    if (showBtn) showBtn.disabled = !category.value || selectedLoggerVendors().length === 0;
 }
 
 function updatePeriodFields() {
@@ -566,7 +606,8 @@ function updateMetrics() {
 function controlsMatchBundle() {
     const range = selectedRange();
     return !!(currentBundle && range && currentBundle.category === category.value
-        && currentBundle.date_from === range[0] && currentBundle.date_to === range[1]);
+        && currentBundle.date_from === range[0] && currentBundle.date_to === range[1]
+        && loggerVendorSignature(currentBundle.selected_vendors || []) === loggerVendorSignature());
 }
 
 function applyResolutionView(showCacheMessage = false) {
@@ -587,9 +628,94 @@ function applyResolutionView(showCacheMessage = false) {
     return true;
 }
 
+function logMonitoringPerformance(data) {
+    const perf = data?.performance;
+    if (!perf || typeof console === 'undefined') return;
+    const beacon = perf.vendors?.beacon || {};
+    const rows = [
+        ['TOTAL request', perf.request_total_ms],
+        ['Metadata seluruh vendor', perf.metadata_ms],
+        ['Fase fetch vendor paralel', perf.vendor_phase_ms],
+        ['Beacon total', beacon.total_ms],
+        ['Beacon bulk /monitoring', beacon.bulk_ms],
+        ['Beacon metadata /beranda', beacon.selector_metadata_ms],
+        ['Beacon supplement exact', beacon.supplement_ms],
+        ['Higertech', perf.vendors?.higertech?.total_ms],
+        ['Tatonas', perf.vendors?.tatonas?.total_ms],
+        ['Dashindo', perf.vendors?.dashindo?.total_ms],
+        ['Agregasi + bentuk tabel', perf.aggregate_ms],
+    ].filter(([, ms]) => Number.isFinite(Number(ms)))
+      .map(([tahap, ms]) => ({tahap, 'waktu (dtk)': (Number(ms) / 1000).toFixed(3)}));
+    console.groupCollapsed(`⏱️ Monitoring performance — ${(Number(perf.request_total_ms || 0) / 1000).toFixed(2)} dtk`);
+    console.table(rows);
+    if (perf.metadata?.vendors_ms) console.table(
+        Object.entries(perf.metadata.vendors_ms).map(([vendor, ms]) => ({vendor: `metadata ${vendor}`, 'waktu (dtk)': (Number(ms) / 1000).toFixed(3)}))
+    );
+    console.log('Beacon detail:', beacon);
+    if (Number.isFinite(Number(beacon.token_cache_hits)) || Number.isFinite(Number(beacon.token_cache_misses))) {
+        console.log('Beacon token cache:', {
+            hit: Number(beacon.token_cache_hits || 0),
+            miss: Number(beacon.token_cache_misses || 0),
+            stale_refresh: Number(beacon.token_cache_stale || 0),
+            ttl_dtk: Number(beacon.token_cache_ttl_s || 0)
+        });
+    }
+    const tatonasDetail = perf.vendors?.tatonas || {};
+    if (tatonasDetail.deadline_ms) {
+        console.log('Tatonas deadline:', {
+            batas_dtk: (Number(tatonasDetail.deadline_ms) / 1000).toFixed(1),
+            deadline_exceeded: Boolean(tatonasDetail.deadline_exceeded),
+            pos_selesai: tatonasDetail.completed_station_count ?? null,
+            pos_dilewati: tatonasDetail.timed_out_station_count ?? 0
+        });
+    }
+    const tatonasStations = tatonasDetail.station_timings;
+    if (Array.isArray(tatonasStations) && tatonasStations.length) {
+        console.log('Tatonas per pos (terlama dulu):');
+        console.table(tatonasStations.map(item => ({
+            pos: item.name || item.id_logger || '-',
+            id_logger: item.id_logger || '-',
+            'waktu (dtk)': (Number(item.total_ms || 0) / 1000).toFixed(3),
+            status: item.ok ? 'OK' : (item.deadline_exceeded ? 'TIMEOUT' : 'GAGAL'),
+            error: item.error || ''
+        })));
+    }
+    const dashindoDetail = perf.vendors?.dashindo || {};
+    if (dashindoDetail.station_count) {
+        console.log('Dashindo transport:', {
+            transport: dashindoDetail.transport || '-',
+            worker: dashindoDetail.worker_count ?? null,
+            koneksi_engineio: dashindoDetail.engine_connection_count ?? null,
+            hourly_direct: dashindoDetail.hourly_direct_count ?? 0,
+            csv_fallback: dashindoDetail.csv_fallback_count ?? 0,
+            deadline_exceeded: Boolean(dashindoDetail.deadline_exceeded)
+        });
+    }
+    const dashindoStations = dashindoDetail.station_timings;
+    if (Array.isArray(dashindoStations) && dashindoStations.length) {
+        console.log('Dashindo per pos (terlama dulu):');
+        console.table(dashindoStations.map(item => ({
+            pos: item.name || item.id_logger || '-',
+            id_logger: item.id_logger || '-',
+            'waktu (dtk)': (Number(item.total_ms || 0) / 1000).toFixed(3),
+            jalur: item.path || '-',
+            status: item.ok ? 'OK' : (item.deadline_exceeded ? 'TIMEOUT' : 'GAGAL'),
+            error: item.error || ''
+        })));
+    }
+    console.log('Performance raw:', perf);
+    console.groupEnd();
+}
+
 async function load() {
     if (!category.value) {
         statusLine.textContent = 'Pilih kategori data terlebih dahulu.';
+        statusLine.className = 'status error';
+        return;
+    }
+    const selectedVendors = selectedLoggerVendors();
+    if (!selectedVendors.length) {
+        statusLine.textContent = 'Pilih minimal satu Logger terlebih dahulu.';
         statusLine.className = 'status error';
         return;
     }
@@ -618,7 +744,8 @@ async function load() {
             updateMetrics();
             downloadBtn.disabled = false;
         }
-        statusLine.textContent = 'Data ditampilkan dari cache sesi.';
+        const loadedCount = (currentData?.stations || []).filter(station => !station?.fetch_failed).length;
+        statusLine.textContent = `${loadedCount} pos berhasil dimuat.`;
         statusLine.className = 'status success';
         lucide.createIcons();
         return;
@@ -632,7 +759,7 @@ async function load() {
         const res = await fetch('/api/monitoring/data', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({category: category.value, resolution: resolution.value, date_from: range[0], date_to: range[1]}),
+            body: JSON.stringify({category: category.value, resolution: resolution.value, date_from: range[0], date_to: range[1], vendors: selectedVendors}),
         });
         let data = {};
         try { data = await res.json(); } catch (_e) { throw new Error('Response server tidak dapat dibaca.'); }
@@ -641,6 +768,7 @@ async function load() {
             throw new Error('Silakan autentikasi server telemetri terlebih dahulu di halaman Olah Data.');
         }
         if (!res.ok || !data.ok) throw new Error(data.error || 'Monitoring gagal dimuat.');
+        logMonitoringPerformance(data);
         currentBundle = data;
         cacheMonitoringBundle(data);
         lastRange = [data.date_from, data.date_to];
@@ -651,13 +779,9 @@ async function load() {
             updateMetrics();
             downloadBtn.disabled = false;
         }
-        if (data.warning_count) {
-            statusLine.textContent = `${data.warning_count} pos/request tidak tersedia; data pos lain tetap ditampilkan.`;
-            statusLine.className = 'status warn';
-        } else {
-            statusLine.textContent = `${(currentData?.stations || []).length} pos berhasil dimuat.`;
-            statusLine.className = 'status success';
-        }
+        const loadedCount = (currentData?.stations || []).filter(station => !station?.fetch_failed).length;
+        statusLine.textContent = `${loadedCount} pos berhasil dimuat.`;
+        statusLine.className = data.warning_count ? 'status warn' : 'status success';
     } catch (err) {
         currentBundle = null;
         currentData = null;
@@ -772,6 +896,45 @@ function exportMonitoring() {
     XLSX.writeFile(wb, `Monitoring ${label} ${resLabel} ${lastRange?.[0] || ''} s.d. ${lastRange?.[1] || ''}.xlsx`);
 }
 
+loggerFilterButton?.addEventListener('click', event => {
+    event.stopPropagation();
+    setLoggerMenuOpen(loggerFilterMenu?.hidden !== false);
+});
+loggerFilterMenu?.addEventListener('click', event => event.stopPropagation());
+loggerSelectAll?.addEventListener('change', () => {
+    loggerVendorCheckboxes.forEach(el => { el.checked = loggerSelectAll.checked; });
+    syncLoggerFilterUI();
+    saveMonitoringState();
+    if (!controlsMatchBundle()) {
+        currentData = null;
+        downloadBtn.disabled = true;
+        statusLine.textContent = selectedLoggerVendors().length
+            ? 'Pilihan Logger berubah. Tekan Tampilkan Data untuk memuat ulang.'
+            : 'Pilih minimal satu Logger terlebih dahulu.';
+        statusLine.className = 'status';
+        updateMetrics();
+    }
+});
+loggerVendorCheckboxes.forEach(el => el.addEventListener('change', () => {
+    syncLoggerFilterUI();
+    saveMonitoringState();
+    if (!controlsMatchBundle()) {
+        currentData = null;
+        downloadBtn.disabled = true;
+        statusLine.textContent = selectedLoggerVendors().length
+            ? 'Pilihan Logger berubah. Tekan Tampilkan Data untuk memuat ulang.'
+            : 'Pilih minimal satu Logger terlebih dahulu.';
+        statusLine.className = 'status';
+        updateMetrics();
+    }
+}));
+document.addEventListener('click', event => {
+    if (loggerFilter && !loggerFilter.contains(event.target)) setLoggerMenuOpen(false);
+});
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') setLoggerMenuOpen(false);
+});
+
 periodMode.addEventListener('change', () => { updatePeriodFields(); saveMonitoringState(); });
 showBtn.addEventListener('click', load);
 downloadBtn.addEventListener('click', exportMonitoring);
@@ -838,6 +1001,10 @@ if (savedMonitoringState) {
     if (savedMonitoringState.yearDate) yearDate.value = savedMonitoringState.yearDate;
     if (savedMonitoringState.dateFrom) dateFrom.value = savedMonitoringState.dateFrom;
     if (savedMonitoringState.dateTo) dateTo.value = savedMonitoringState.dateTo;
+    if (Array.isArray(savedMonitoringState.vendors)) {
+        const wanted = new Set(savedMonitoringState.vendors);
+        loggerVendorCheckboxes.forEach(el => { el.checked = wanted.has(el.value); });
+    }
     orientation = savedMonitoringState.orientation === 'vertical' ? 'vertical' : 'horizontal';
 } else {
     category.value = '';
@@ -845,6 +1012,7 @@ if (savedMonitoringState) {
 }
 horizontalBtn.classList.toggle('active', orientation === 'horizontal');
 verticalBtn.classList.toggle('active', orientation === 'vertical');
+syncLoggerFilterUI();
 updatePeriodFields();
 updateMetrics();
 syncMonitoringSummary();

@@ -56,6 +56,9 @@
                 <a href="{{ url_for('monitoring_page') }}" id="monitorNavLink" class="app-nav-link {% block nav_monitor_class %}{% endblock %}{{ '' if ui_authenticated else ' disabled' }}" data-auth-required="true" aria-disabled="{{ 'false' if ui_authenticated else 'true' }}"{% if not ui_authenticated %} tabindex="-1"{% endif %}>
                     <i data-lucide="table-properties"></i><span>Monitoring</span>
                 </a>
+                <a href="{{ url_for('spatial_page') }}" class="app-nav-link {% block nav_spatial_class %}{% endblock %}">
+                    <i data-lucide="map"></i><span>Spasial</span>
+                </a>
             </nav>
         </div>
 

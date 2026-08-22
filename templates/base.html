@@ -16,29 +16,61 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/ui-components.css') }}">
     <style>
+        /* Placeholder menu: fitur belum aktif, namun tetap terasa sebagai bagian dari roadmap. */
         .spatial-coming-link {
             position: relative;
+            cursor: default;
+            user-select: none;
+            opacity: .82;
+        }
+
+        .spatial-coming-link:hover {
+            background: transparent;
         }
 
         .spatial-coming-label {
             position: relative;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            min-width: 4.35rem;
+            line-height: 1;
+        }
+
+        .spatial-coming-title {
+            position: relative;
+            z-index: 1;
         }
 
         .spatial-coming-badge {
             position: absolute;
-            top: -0.55rem;
-            left: 55%;
             z-index: 2;
+            top: -0.62rem;
+            left: 0.08rem;
             color: #dc2626;
-            font-size: 0.58rem;
-            font-style: italic;
+            font-size: .56rem;
             font-weight: 800;
+            font-style: italic;
             line-height: 1;
+            letter-spacing: .035em;
             white-space: nowrap;
-            letter-spacing: -0.02em;
-            transform: rotate(-8deg);
+            text-transform: uppercase;
+            transform: rotate(8deg);
+            transform-origin: left center;
             pointer-events: none;
+            opacity: .92;
+        }
+
+        @media (max-width: 720px) {
+            .spatial-coming-label {
+                min-width: 3.9rem;
+            }
+
+            .spatial-coming-badge {
+                top: -0.52rem;
+                left: 0;
+                font-size: .49rem;
+                transform: rotate(7deg);
+            }
         }
     </style>
     <script>
@@ -76,10 +108,13 @@
             </div>
 
             <nav class="app-nav" aria-label="Navigasi utama">
-                <span class="app-nav-link disabled spatial-coming-link" aria-disabled="true" title="Fitur Spasial akan datang">
+                <span class="app-nav-link disabled spatial-coming-link"
+                      aria-disabled="true"
+                      aria-label="Spasial — Akan Datang"
+                      title="Spasial — Akan Datang">
                     <i data-lucide="map"></i>
-                    <span class="spatial-coming-label">
-                        Spasial
+                    <span class="spatial-coming-label" aria-hidden="true">
+                        <span class="spatial-coming-title">Spasial</span>
                         <span class="spatial-coming-badge">Akan Datang</span>
                     </span>
                 </span>

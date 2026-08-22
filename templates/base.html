@@ -16,60 +16,58 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/ui-components.css') }}">
     <style>
-        /* Placeholder menu: fitur belum aktif, namun tetap terasa sebagai bagian dari roadmap. */
-        .spatial-coming-link {
-            position: relative;
+        /*
+         * Upcoming navigation item.
+         * Pola micro-badge terpisah dipilih agar status fitur terbaca jelas
+         * tanpa mengganggu hierarki label navigasi.
+         */
+        .app-nav-upcoming {
             cursor: default;
             user-select: none;
-            opacity: .82;
         }
 
-        .spatial-coming-link:hover {
-            background: transparent;
-        }
-
-        .spatial-coming-label {
-            position: relative;
+        .app-nav-upcoming .nav-upcoming-content {
             display: inline-flex;
             align-items: center;
-            min-width: 4.35rem;
-            line-height: 1;
+            gap: .38rem;
+            min-width: 0;
         }
 
-        .spatial-coming-title {
-            position: relative;
-            z-index: 1;
-        }
-
-        .spatial-coming-badge {
-            position: absolute;
-            z-index: 2;
-            top: -0.62rem;
-            left: 0.08rem;
-            color: #dc2626;
-            font-size: .56rem;
+        .app-nav-upcoming .nav-upcoming-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 1rem;
+            padding: .12rem .38rem;
+            border: 1px solid rgba(185, 28, 28, .18);
+            border-radius: 999px;
+            background: rgba(220, 38, 38, .07);
+            color: #b91c1c;
+            font-size: .52rem;
             font-weight: 800;
-            font-style: italic;
             line-height: 1;
-            letter-spacing: .035em;
+            letter-spacing: .055em;
             white-space: nowrap;
             text-transform: uppercase;
-            transform: rotate(8deg);
-            transform-origin: left center;
-            pointer-events: none;
-            opacity: .92;
+            transform: translateY(-.32rem);
+        }
+
+        [data-theme="dark"] .app-nav-upcoming .nav-upcoming-badge,
+        html[data-bs-theme="dark"] .app-nav-upcoming .nav-upcoming-badge {
+            border-color: rgba(248, 113, 113, .24);
+            background: rgba(248, 113, 113, .10);
+            color: #fca5a5;
         }
 
         @media (max-width: 720px) {
-            .spatial-coming-label {
-                min-width: 3.9rem;
+            .app-nav-upcoming .nav-upcoming-content {
+                gap: .26rem;
             }
 
-            .spatial-coming-badge {
-                top: -0.52rem;
-                left: 0;
-                font-size: .49rem;
-                transform: rotate(7deg);
+            .app-nav-upcoming .nav-upcoming-badge {
+                padding: .10rem .30rem;
+                font-size: .46rem;
+                transform: translateY(-.28rem);
             }
         }
     </style>
@@ -108,14 +106,14 @@
             </div>
 
             <nav class="app-nav" aria-label="Navigasi utama">
-                <span class="app-nav-link disabled spatial-coming-link"
+                <span class="app-nav-link disabled app-nav-upcoming"
                       aria-disabled="true"
                       aria-label="Spasial — Akan Datang"
-                      title="Spasial — Akan Datang">
+                      title="Fitur Spasial akan datang">
                     <i data-lucide="map"></i>
-                    <span class="spatial-coming-label" aria-hidden="true">
-                        <span class="spatial-coming-title">Spasial</span>
-                        <span class="spatial-coming-badge">Akan Datang</span>
+                    <span class="nav-upcoming-content" aria-hidden="true">
+                        <span>Spasial</span>
+                        <span class="nav-upcoming-badge">Akan Datang</span>
                     </span>
                 </span>
                 <a href="{{ url_for('index') }}" class="app-nav-link {% block nav_olah_class %}{% endblock %}">
